@@ -101,6 +101,16 @@ SAMPLE_TRAINS: List[Dict[str, Any]] = [
         "departure_time": "09:55", "arrival_time": "19:35", "day_offset": 0, "classes": ["1A", "2A", "3A", "SL"],
         "avg_delay_mins": 30, "availability_status": "AVAILABLE-0015", "confirmation_prob": 0.91
     },
+    {
+        "train_no": "12190", "train_name": "Bhopal Express Trap", "src_station": "BPL", "dest_station": "CSMT",
+        "departure_time": "14:15", "arrival_time": "23:55", "day_offset": 0, "classes": ["2A", "3A"],
+        "avg_delay_mins": 5, "availability_status": "AVAILABLE-0050", "confirmation_prob": 0.95
+    },
+    {
+        "train_no": "12154", "train_name": "Vindhyachal Express", "src_station": "BPL", "dest_station": "CSMT",
+        "departure_time": "05:20", "arrival_time": "15:30", "day_offset": 0, "classes": ["2A", "3A", "SL"],
+        "avg_delay_mins": 10, "availability_status": "AVAILABLE-0020", "confirmation_prob": 0.90
+    },
 
     # NGP routes
     {
@@ -188,6 +198,41 @@ SAMPLE_TRAINS: List[Dict[str, Any]] = [
         "train_no": "12932", "train_name": "Ahmedabad Double Decker", "src_station": "ADI", "dest_station": "CSMT",
         "departure_time": "06:00", "arrival_time": "13:00", "day_offset": 0, "classes": ["CC"],
         "avg_delay_mins": 10, "availability_status": "AVAILABLE-0095", "confirmation_prob": 0.98
+    },
+    {
+        "train_no": "12052", "train_name": "Mandovi Jan Shatabdi", "src_station": "CSMT", "dest_station": "MAO",
+        "departure_time": "16:15", "arrival_time": "23:50", "day_offset": 0, "classes": ["CC", "2S"],
+        "avg_delay_mins": 10, "availability_status": "AVAILABLE-0060", "confirmation_prob": 0.98
+    },
+    {
+        "train_no": "12050", "train_name": "Jan Shatabdi Express", "src_station": "CSMT", "dest_station": "MAO",
+        "departure_time": "12:30", "arrival_time": "21:15", "day_offset": 0, "classes": ["CC", "2S"],
+        "avg_delay_mins": 10, "availability_status": "AVAILABLE-0040", "confirmation_prob": 0.95
+    },
+    {
+        "train_no": "12149", "train_name": "Pune Jabalpur SF", "src_station": "PUNE", "dest_station": "JBP",
+        "departure_time": "21:05", "arrival_time": "13:40", "day_offset": 1, "classes": ["2A", "3A", "SL"],
+        "avg_delay_mins": 20, "availability_status": "AVAILABLE-0035", "confirmation_prob": 0.92
+    },
+    {
+        "train_no": "12051", "train_name": "Goa Express (Morning)", "src_station": "PUNE", "dest_station": "MAO",
+        "departure_time": "08:45", "arrival_time": "18:30", "day_offset": 0, "classes": ["2A", "3A", "SL"],
+        "avg_delay_mins": 15, "availability_status": "AVAILABLE-0040", "confirmation_prob": 0.94
+    },
+    {
+        "train_no": "12809", "train_name": "Howrah Mail", "src_station": "NGP", "dest_station": "HWH",
+        "departure_time": "11:30", "arrival_time": "05:45", "day_offset": 1, "classes": ["1A", "2A", "3A", "SL"],
+        "avg_delay_mins": 25, "availability_status": "AVAILABLE-0025", "confirmation_prob": 0.90
+    },
+    {
+        "train_no": "12322", "train_name": "Kolkata Mail via Jabalpur", "src_station": "CSMT", "dest_station": "JBP",
+        "departure_time": "22:15", "arrival_time": "13:30", "day_offset": 1, "classes": ["1A", "2A", "3A", "SL"],
+        "avg_delay_mins": 15, "availability_status": "AVAILABLE-0018", "confirmation_prob": 0.93
+    },
+    {
+        "train_no": "12294", "train_name": "Prayagraj Duronto", "src_station": "PRYJ", "dest_station": "CSMT",
+        "departure_time": "20:10", "arrival_time": "14:40", "day_offset": 1, "classes": ["1A", "2A", "3A"],
+        "avg_delay_mins": 10, "availability_status": "AVAILABLE-0012", "confirmation_prob": 0.96
     },
 ]
 
