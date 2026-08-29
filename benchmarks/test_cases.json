@@ -1,0 +1,38 @@
+[
+  {
+    "query_id": "TC001",
+    "origin": "NDLS",
+    "destination": "MAO",
+    "travel_date": "2026-09-15",
+    "preferred_class": "3A",
+    "max_layover_mins": 360,
+    "description": "Long-distance journey from New Delhi to Goa requiring split itinerary via Bhopal/Mumbai."
+  },
+  {
+    "query_id": "TC002",
+    "origin": "NDLS",
+    "destination": "CSMT",
+    "travel_date": "2026-09-15",
+    "preferred_class": "2A",
+    "max_layover_mins": 240,
+    "description": "Trunk route from New Delhi to Mumbai comparing direct Rajdhani with split via Bhopal."
+  },
+  {
+    "query_id": "TC003",
+    "origin": "PUNE",
+    "destination": "BSB",
+    "travel_date": "2026-09-16",
+    "preferred_class": "3A",
+    "max_layover_mins": 300,
+    "description": "Cross-zone journey from Pune to Varanasi requiring split via Jabalpur."
+  },
+  {
+    "query_id": "TC004",
+    "origin": "NGP",
+    "destination": "MAO",
+    "travel_date": "2026-09-16",
+    "preferred_class": "SL",
+    "max_layover_mins": 360,
+    "description": "Central India to West Coast split journey via Pune or Mumbai."
+  }
+]

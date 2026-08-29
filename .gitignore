@@ -1,0 +1,21 @@
+# Environments
+.env
+.venv/
+env/
+venv/
+ENV/
+
+# Python Byte-compiled
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data & Logs
+data/raw/
+data/processed/
+logs/
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
