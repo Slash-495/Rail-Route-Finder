@@ -1,6 +1,6 @@
 """
 Automated Scoring Engine & Benchmark Evaluator for RailRouteAgent.
-Evaluates baseline naive solver vs agentic split-journey planner across benchmark scenarios.
+Evaluates zero-shot LLM baseline (Iteration 0), heuristic solver, and agentic split-journey planner.
 """
 
 import argparse
@@ -13,8 +13,9 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
-from src.config import TEST_CASES_JSON, TRAIN_NETWORK_JSON, LOGS_DIR
+from src.config import TEST_CASES_JSON, TRAIN_NETWORK_JSON, LOGS_DIR, TRAJECTORIES_DIR
 from src.schema import Station, TrainSchedule, Leg, SplitItinerary
+from src.agents.baseline_agent import ZeroShotBaselineAgent
 
 
 class TestCase(BaseModel):
@@ -41,7 +42,7 @@ def parse_time_to_minutes(time_str: str) -> int:
 
 
 class BaselineSolver:
-    """Naive timetable graph search solver (baseline).
+    """Naive timetable graph search solver (heuristic baseline).
     Ignores strict layover buffer limits and average delay risks.
     """
 
@@ -54,7 +55,6 @@ class BaselineSolver:
         origin = tc.origin
         dest = tc.destination
 
-        # Find candidate 2-leg split journeys
         first_legs = [t for t in self.trains if t["src_station"] == origin]
         second_legs = [t for t in self.trains if t["dest_station"] == dest]
 
@@ -66,13 +66,11 @@ class BaselineSolver:
                 arr1 = parse_time_to_minutes(t1["arrival_time"])
                 dep2 = parse_time_to_minutes(t2["departure_time"])
 
-                # Naive check: only requires departure after arrival (allowing tight 10-min layovers)
                 if dep2 > arr1:
                     layover = dep2 - arr1
                 else:
                     layover = (dep2 + 1440) - arr1
 
-                # Naive solver accepts any positive layover up to max_acceptable_layover
                 if 0 < layover <= tc.max_acceptable_layover_mins:
                     leg1 = Leg(
                         train=TrainSchedule(**{k: v for k, v in t1.items() if k in TrainSchedule.model_fields}),
@@ -95,7 +93,6 @@ class BaselineSolver:
                         confirmation_prob=t2.get("confirmation_prob", 0.85)
                     )
 
-                    # Naive evaluation ignores buffer constraints & delay risk
                     is_feasible = (layover >= tc.min_acceptable_buffer_mins) and (layover - t1.get("avg_delay_mins", 0) >= 15)
 
                     duration = (parse_time_to_minutes(t2["arrival_time"]) + t2.get("day_offset", 0) * 1440) - parse_time_to_minutes(t1["departure_time"])
@@ -113,7 +110,6 @@ class BaselineSolver:
                         feasibility_notes="Naive graph join path found." if is_feasible else f"Naive path accepted despite layover {layover}m or delay risk.",
                         overall_confirmation_prob=round(leg1.confirmation_prob * leg2.confirmation_prob, 2)
                     )
-                    # Baseline does not hallucinate valid trains, but fails feasibility on edge cases
                     return itinerary, False, is_feasible
 
         return None, False, False
@@ -152,21 +148,17 @@ class AgentSolver:
                 else:
                     layover = (dep2 + 1440) - arr1
 
-                # Agent Strict Constraint 1: Transfer Layover Buffer >= min_acceptable_buffer_mins
                 if layover < tc.min_acceptable_buffer_mins:
                     continue
 
-                # Agent Strict Constraint 2: Effective Buffer after Train 1 Avg Delay >= 15 mins
                 t1_delay = t1.get("avg_delay_mins", 0)
                 effective_buffer = layover - t1_delay
                 if effective_buffer < 15:
                     continue
 
-                # Constraint 3: Layover does not exceed max limit
                 if layover > tc.max_acceptable_layover_mins:
                     continue
 
-                # Valid agent route
                 prob1 = t1.get("confirmation_prob", 0.85)
                 prob2 = t2.get("confirmation_prob", 0.85)
                 overall_prob = round(prob1 * prob2, 2)
@@ -254,6 +246,42 @@ class BenchmarkEvaluator:
         with open(self.network_path, "r", encoding="utf-8") as f:
             self.train_network = json.load(f)
 
+    def verify_llm_itinerary(self, tc: TestCase, itinerary: Optional[SplitItinerary]) -> Tuple[bool, bool]:
+        """Strictly verifies LLM output for Hallucination and Operational Feasibility.
+        Returns: (is_hallucination, is_feasible)
+        """
+        if itinerary is None:
+            return False, False
+
+        valid_train_nos = {t["train_no"] for t in self.train_network.get("trains", [])}
+        train_map = {t["train_no"]: t for t in self.train_network.get("trains", [])}
+
+        # Check for Hallucination: train numbers must exist in dataset
+        is_hallucination = False
+        for leg in itinerary.legs:
+            if leg.train.train_no not in valid_train_nos:
+                is_hallucination = True
+                break
+
+        if is_hallucination:
+            return True, False
+
+        # Verify operational feasibility constraints
+        # 1. Layover buffer must be >= min_acceptable_buffer_mins
+        if itinerary.layover_buffer_mins < tc.min_acceptable_buffer_mins:
+            return False, False
+
+        # 2. Check cascading delay safety margin for leg 1
+        leg1_train_no = itinerary.legs[0].train.train_no
+        t1_data = train_map.get(leg1_train_no, {})
+        avg_delay = t1_data.get("avg_delay_mins", 0)
+
+        effective_buffer = itinerary.layover_buffer_mins - avg_delay
+        if effective_buffer < 15:
+            return False, False
+
+        return False, True
+
     def calculate_metrics(self, solver_results: List[Dict[str, Any]]) -> Dict[str, float]:
         """Calculate evaluation metrics for a set of solver results."""
         total = len(solver_results)
@@ -279,53 +307,100 @@ class BenchmarkEvaluator:
             "avg_confirmation_prob": round(avg_prob, 4)
         }
 
-    def run_evaluation(self) -> Dict[str, Any]:
-        """Executes full benchmark evaluation across Baseline and Agent solvers."""
+    def run_baseline_llm(self) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
+        """Execute Zero-Shot LLM Baseline Agent (Iteration 0) and log trajectories."""
         self.load_and_validate_test_cases()
         self.load_network()
 
-        baseline_solver = BaselineSolver(self.train_network)
-        agent_solver = AgentSolver(self.train_network)
-
+        baseline_agent = ZeroShotBaselineAgent(self.train_network)
         baseline_results = []
-        agent_results = []
-
-        detailed_logs = []
+        trajectories = []
 
         for tc in self.test_cases:
-            b_itin, b_hallu, b_feas = baseline_solver.solve(tc)
+            itin, prompt, raw_response = baseline_agent.solve(
+                origin=tc.origin,
+                destination=tc.destination,
+                preferred_class=tc.preferred_class,
+                date_offset=tc.travel_date_offset_days
+            )
+
+            is_hallu, is_feas = self.verify_llm_itinerary(tc, itin)
+
+            baseline_results.append({
+                "tc_id": tc.id,
+                "itinerary": itin,
+                "is_hallucination": is_hallu,
+                "is_feasible": is_feas
+            })
+
+            trajectories.append({
+                "test_case_id": tc.id,
+                "scenario_type": tc.scenario_type,
+                "prompt": prompt,
+                "raw_response": raw_response,
+                "parsed_itinerary": itin.model_dump() if itin else None,
+                "is_hallucination": is_hallu,
+                "is_feasible": is_feas
+            })
+
+        # Save baseline trajectories log
+        TRAJECTORIES_DIR.mkdir(parents=True, exist_ok=True)
+        traj_file = TRAJECTORIES_DIR / "baseline_trajectories.json"
+        with open(traj_file, "w", encoding="utf-8") as f:
+            json.dump(trajectories, f, indent=2)
+
+        metrics = self.calculate_metrics(baseline_results)
+        return metrics, trajectories
+
+    def run_evaluation(self, mode: str = "compare") -> Dict[str, Any]:
+        """Executes evaluation across requested mode: 'baseline', 'heuristic', 'agent', or 'compare'."""
+        self.load_and_validate_test_cases()
+        self.load_network()
+
+        heuristic_solver = BaselineSolver(self.train_network)
+        agent_solver = AgentSolver(self.train_network)
+
+        h_results, a_results = [], []
+        detailed_logs = []
+
+        # Run Zero-Shot Baseline LLM if mode is baseline or compare
+        b_llm_metrics, b_trajectories = None, None
+        if mode in ("baseline", "compare"):
+            b_llm_metrics, b_trajectories = self.run_baseline_llm()
+
+        for tc in self.test_cases:
+            h_itin, h_hallu, h_feas = heuristic_solver.solve(tc)
             a_itin, a_hallu, a_feas = agent_solver.solve(tc)
 
-            baseline_results.append({"tc_id": tc.id, "itinerary": b_itin, "is_hallucination": b_hallu, "is_feasible": b_feas})
-            agent_results.append({"tc_id": tc.id, "itinerary": a_itin, "is_hallucination": a_hallu, "is_feasible": a_feas})
+            h_results.append({"tc_id": tc.id, "itinerary": h_itin, "is_hallucination": h_hallu, "is_feasible": h_feas})
+            a_results.append({"tc_id": tc.id, "itinerary": a_itin, "is_hallucination": a_hallu, "is_feasible": a_feas})
 
             detailed_logs.append({
                 "test_case_id": tc.id,
                 "difficulty": tc.difficulty,
                 "scenario_type": tc.scenario_type,
-                "baseline": {
-                    "found": b_itin is not None,
-                    "is_feasible": b_feas,
-                    "route_id": b_itin.route_id if b_itin else None,
-                    "layover_buffer_mins": b_itin.layover_buffer_mins if b_itin else None,
-                    "overall_confirmation_prob": b_itin.overall_confirmation_prob if b_itin else None
+                "heuristic_baseline": {
+                    "found": h_itin is not None,
+                    "is_feasible": h_feas,
+                    "route_id": h_itin.route_id if h_itin else None,
+                    "layover_buffer_mins": h_itin.layover_buffer_mins if h_itin else None,
                 },
                 "agent": {
                     "found": a_itin is not None,
                     "is_feasible": a_feas,
                     "route_id": a_itin.route_id if a_itin else None,
                     "layover_buffer_mins": a_itin.layover_buffer_mins if a_itin else None,
-                    "overall_confirmation_prob": a_itin.overall_confirmation_prob if a_itin else None
                 }
             })
 
-        baseline_metrics = self.calculate_metrics(baseline_results)
-        agent_metrics = self.calculate_metrics(agent_results)
+        h_metrics = self.calculate_metrics(h_results)
+        a_metrics = self.calculate_metrics(a_results)
 
         evaluation_output = {
             "summary_metrics": {
-                "baseline": baseline_metrics,
-                "agent": agent_metrics
+                "zero_shot_llm_baseline": b_llm_metrics or self.calculate_metrics([]),
+                "heuristic_baseline": h_metrics,
+                "agent": a_metrics
             },
             "detailed_case_results": detailed_logs
         }
@@ -333,54 +408,55 @@ class BenchmarkEvaluator:
         return evaluation_output
 
     def display_rich_summary(self, eval_results: Dict[str, Any]):
-        """Render beautiful summary table comparing Baseline vs Agent."""
+        """Render beautiful summary table comparing Zero-Shot Baseline vs Heuristic vs Agent."""
         console = Console()
-        b_m = eval_results["summary_metrics"]["baseline"]
+        b_llm = eval_results["summary_metrics"].get("zero_shot_llm_baseline", {})
+        h_m = eval_results["summary_metrics"]["heuristic_baseline"]
         a_m = eval_results["summary_metrics"]["agent"]
 
-        table = Table(title="[RailRouteAgent] Benchmark Evaluation Results", show_header=True, header_style="bold cyan")
-        table.add_column("Metric", style="bold white", width=35)
-        table.add_column("Baseline Solver", justify="right", style="yellow", width=18)
-        table.add_column("Agent Solution", justify="right", style="bold green", width=18)
-        table.add_column("Improvement", justify="right", style="bold magenta", width=18)
+        table = Table(title="[RailRouteAgent] Benchmark Evaluation Summary", show_header=True, header_style="bold cyan")
+        table.add_column("Metric", style="bold white", min_width=35, no_wrap=True)
+        table.add_column("Zero-Shot LLM (Iter 0)", justify="center", style="yellow", min_width=22, no_wrap=True)
+        table.add_column("Agent Solution", justify="center", style="bold green", min_width=20, no_wrap=True)
+        table.add_column("Improvement", justify="center", style="bold magenta", min_width=18, no_wrap=True)
 
         # Viable Route Found Rate
-        diff_viable = a_m["viable_route_found_rate"] - b_m["viable_route_found_rate"]
+        diff_viable = a_m["viable_route_found_rate"] - b_llm.get("viable_route_found_rate", 0.0)
         table.add_row(
             "Viable Route Found Rate (%)",
-            f"{b_m['viable_route_found_rate']:.1f}%",
+            f"{b_llm.get('viable_route_found_rate', 0.0):.1f}%",
             f"{a_m['viable_route_found_rate']:.1f}%",
             f"{diff_viable:+.1f}%"
         )
 
         # Operational Feasibility Pass Rate
-        diff_feas = a_m["operational_feasibility_pass_rate"] - b_m["operational_feasibility_pass_rate"]
+        diff_feas = a_m["operational_feasibility_pass_rate"] - b_llm.get("operational_feasibility_pass_rate", 0.0)
         table.add_row(
             "Operational Feasibility Pass Rate (%)",
-            f"{b_m['operational_feasibility_pass_rate']:.1f}%",
+            f"{b_llm.get('operational_feasibility_pass_rate', 0.0):.1f}%",
             f"{a_m['operational_feasibility_pass_rate']:.1f}%",
             f"[bold green]{diff_feas:+.1f}%[/bold green]"
         )
 
         # Hallucination / Invalid Connection Rate
-        diff_hallu = a_m["hallucination_rate"] - b_m["hallucination_rate"]
+        diff_hallu = a_m["hallucination_rate"] - b_llm.get("hallucination_rate", 0.0)
         table.add_row(
             "Hallucination / Invalid Connection Rate (%)",
-            f"{b_m['hallucination_rate']:.1f}%",
+            f"{b_llm.get('hallucination_rate', 0.0):.1f}%",
             f"{a_m['hallucination_rate']:.1f}%",
             f"{diff_hallu:+.1f}%"
         )
 
         # Average Confirmation Probability
-        diff_prob = a_m["avg_confirmation_prob"] - b_m["avg_confirmation_prob"]
+        diff_prob = a_m["avg_confirmation_prob"] - b_llm.get("avg_confirmation_prob", 0.0)
         table.add_row(
             "Average Confirmation Probability",
-            f"{b_m['avg_confirmation_prob']:.4f}",
+            f"{b_llm.get('avg_confirmation_prob', 0.0):.4f}",
             f"{a_m['avg_confirmation_prob']:.4f}",
             f"{diff_prob:+.4f}"
         )
 
-        console.print(Panel(table, border_style="green", title="Evaluation Completed"))
+        console.print(Panel(table, border_style="green", title="Iteration Evaluation Completed"))
 
     def save_results(self, eval_results: Dict[str, Any], output_path: Path = LOGS_DIR / "benchmark_results.json"):
         """Save benchmark results to logs directory."""
@@ -392,6 +468,7 @@ class BenchmarkEvaluator:
 def main():
     parser = argparse.ArgumentParser(description="RailRouteAgent Benchmark Scoring Engine & Evaluator")
     parser.add_argument("--dry-run", action="store_true", help="Validate test cases schema without running solver evaluation")
+    parser.add_argument("--mode", choices=["baseline", "heuristic", "agent", "compare"], default="compare", help="Evaluation mode")
     parser.add_argument("--test-cases", type=Path, default=TEST_CASES_JSON, help="Path to test cases JSON file")
     parser.add_argument("--output", type=Path, default=LOGS_DIR / "benchmark_results.json", help="Path to write evaluation results")
 
@@ -416,7 +493,7 @@ def main():
             ))
             raise SystemExit(1)
     else:
-        results = evaluator.run_evaluation()
+        results = evaluator.run_evaluation(mode=args.mode)
         evaluator.display_rich_summary(results)
         evaluator.save_results(results, output_path=args.output)
 
