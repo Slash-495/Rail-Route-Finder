@@ -13,6 +13,7 @@ from src.tools.risk_tools import calculate_connection_risk, get_historical_delay
 from src.tools.ml_scorer import predict_pnr_confirmation
 from src.tools.routing_tools import find_direct_trains
 from src.agents.planner_agent import PlannerAgent, CandidateRoute, ProposedRouteResponse
+from src.utils.logger import get_logger
 
 try:
     from google import genai
@@ -69,10 +70,16 @@ class VerifierAgent:
 
         verified_itineraries: List[SplitItinerary] = []
         active_constraints: List[str] = []
+        failed_junctions: List[str] = []
 
         for attempt in range(max_retries):
             # 1. GENERATE: Obtain candidate routes from PlannerAgent
-            plan = self.planner.plan_route(origin_upper, dest_upper, date)
+            plan = self.planner.plan_route(
+                origin_upper,
+                dest_upper,
+                date,
+                rejected_junctions=failed_junctions if failed_junctions else None
+            )
             candidate_routes = plan.get("candidate_routes", [])
 
             self.trajectory.append({
@@ -80,7 +87,8 @@ class VerifierAgent:
                 "step": "planner_proposal",
                 "candidate_count": len(candidate_routes),
                 "candidates": candidate_routes,
-                "active_constraints": list(active_constraints)
+                "active_constraints": list(active_constraints),
+                "failed_junctions": list(failed_junctions)
             })
 
             audit_results: List[VerificationResult] = []
@@ -95,6 +103,9 @@ class VerifierAgent:
                     junction=cand["junction"],
                     scheduled_layover_mins=cand["scheduled_layover_mins"]
                 )
+
+                get_logger().log_event("Verifier", "tool_call", {"tool": "calculate_connection_risk", "args": {"train_1": cand["train_1_no"], "train_2": cand["train_2_no"], "junction": cand["junction"], "scheduled_layover_mins": cand["scheduled_layover_mins"]}})
+                get_logger().log_event("Verifier", "tool_response", risk_res)
 
                 audit_item = VerificationResult(
                     candidate_index=idx,
@@ -178,10 +189,16 @@ class VerifierAgent:
                     )
                     attempt_verified.append(itinerary)
                 else:
-                    critiques.append(
+                    junc_code = cand["junction"].upper()
+                    if junc_code not in failed_junctions:
+                        failed_junctions.append(junc_code)
+
+                    critique_msg = (
                         f"CRITIQUE (Iteration {attempt + 1}): Candidate via {cand['junction']} "
                         f"(Trains {cand['train_1_no']} -> {cand['train_2_no']}) REJECTED: {risk_res['reason']}"
                     )
+                    critiques.append(critique_msg)
+                    get_logger().log_event("Verifier", "reflection_feedback", {"iteration": attempt + 1, "critique": critique_msg})
 
             # Log step in refinement dialogue history
             self.refinement_history.append({

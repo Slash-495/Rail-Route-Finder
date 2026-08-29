@@ -8,6 +8,7 @@ from typing import List, Dict, Any, Optional
 
 from src.config import GEMINI_API_KEY
 from src.tools.ml_scorer import predict_pnr_confirmation
+from src.utils.logger import get_logger
 
 try:
     from google import genai
@@ -64,6 +65,7 @@ class RankingAgent:
         )
 
         input_payload = json.dumps(enriched_routes, indent=2)
+        get_logger().log_event("Ranking", "prompt", {"enriched_routes_count": len(enriched_routes), "payload": enriched_routes})
 
         self.trajectory.append({
             "step": "input_payload",
@@ -75,11 +77,13 @@ class RankingAgent:
         if GEMINI_API_KEY and HAS_GENAI:
             markdown_report = self._generate_llm_summary(input_payload)
             if markdown_report:
+                get_logger().log_event("Ranking", "tool_response", {"report": markdown_report})
                 self.trajectory.append({"step": "llm_output", "markdown": markdown_report})
                 return markdown_report
 
         # Deterministic fallback renderer
         markdown_report = self._render_fallback_markdown(enriched_routes)
+        get_logger().log_event("Ranking", "tool_response", {"report": markdown_report})
         self.trajectory.append({"step": "fallback_output", "markdown": markdown_report})
         return markdown_report
 

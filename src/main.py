@@ -12,6 +12,7 @@ from rich.markdown import Markdown
 from rich.panel import Panel
 
 from src.agents import VerifierAgent, RankingAgent
+from src.utils.logger import get_logger
 
 
 def run_pipeline(origin: str, destination: str, date: str = "2026-09-15", interactive: bool = True) -> int:
@@ -34,6 +35,10 @@ def run_pipeline(origin: str, destination: str, date: str = "2026-09-15", intera
         border_style="cyan"
     ))
 
+    session_id = f"{origin}_{destination}_{date}".replace("-", "")
+    logger = get_logger()
+    logger.log_event("System", "prompt", {"origin": origin, "destination": destination, "date": date, "interactive": interactive})
+
     verifier = VerifierAgent()
     ranker = RankingAgent()
 
@@ -43,6 +48,7 @@ def run_pipeline(origin: str, destination: str, date: str = "2026-09-15", intera
 
     if not verified_routes:
         console.print("[bold red]❌ No operationally feasible split-journey routes found matching the mandatory safety criteria.[/bold red]")
+        logger.export_trajectory(session_id)
         return 1
 
     # Step 3: Ranking Agent Synthesis
@@ -59,10 +65,18 @@ def run_pipeline(origin: str, destination: str, date: str = "2026-09-15", intera
             choice = input("⚠️  [ACTION REQUIRED] Select an itinerary number to simulate booking (or press 'Q' to abort): ").strip()
             if choice.upper() == "Q":
                 console.print("[yellow]Booking simulation aborted by user.[/yellow]")
+                logger.log_event("System", "human_checkpoint", {"action": "ABORT", "user_input": choice})
+                logger.export_trajectory(session_id)
                 return 0
             elif choice.isdigit() and 1 <= int(choice) <= len(verified_routes):
                 selected_idx = int(choice)
                 selected_route = verified_routes[selected_idx - 1]
+                logger.log_event("System", "human_checkpoint", {
+                    "action": "SIMULATE_BOOKING",
+                    "option_selected": selected_idx,
+                    "route_id": selected_route.get("route_id"),
+                    "user_input": choice
+                })
                 console.print(Panel(
                     f"[bold green]✅ [SANDBOX] Booking simulation successful for Option {selected_idx}. No actual transaction occurred.[/bold green]\n"
                     f"[bold white]Route ID:[/bold white] {selected_route.get('route_id')}\n"
@@ -70,14 +84,19 @@ def run_pipeline(origin: str, destination: str, date: str = "2026-09-15", intera
                     title="[RailRouteAgent] IRCTC Booking Safety Gate",
                     border_style="green"
                 ))
+                logger.export_trajectory(session_id)
                 return 0
             else:
                 console.print("[bold red]Invalid selection. Booking simulation cancelled.[/bold red]")
+                logger.log_event("System", "human_checkpoint", {"action": "INVALID_SELECTION", "user_input": choice})
+                logger.export_trajectory(session_id)
                 return 1
         except (KeyboardInterrupt, EOFError):
             console.print("\n[yellow]Execution terminated.[/yellow]")
+            logger.export_trajectory(session_id)
             return 0
 
+    logger.export_trajectory(session_id)
     return 0
 
 

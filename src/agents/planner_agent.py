@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 
 from src.config import GEMINI_API_KEY, OPENAI_API_KEY
 from src.tools.routing_tools import find_direct_trains, find_split_junctions
+from src.utils.logger import get_logger
 
 try:
     from google import genai
@@ -57,13 +58,20 @@ class PlannerAgent:
         self.model_name = model_name
         self.trajectory: List[Dict[str, Any]] = []
 
-    def plan_route(self, origin: str, destination: str, date: str = "2026-09-15") -> Dict[str, Any]:
+    def plan_route(
+        self,
+        origin: str,
+        destination: str,
+        date: str = "2026-09-15",
+        rejected_junctions: Optional[List[str]] = None
+    ) -> Dict[str, Any]:
         """Plans candidate split journey routes using tool calls and trajectory logging.
 
         Args:
             origin: Origin station code (e.g. "NDLS").
             destination: Destination station code (e.g. "MAO").
             date: Requested travel date string.
+            rejected_junctions: Optional list of junction station codes to strictly avoid.
 
         Returns:
             Dict[str, Any]: Model dump of ProposedRouteResponse.
@@ -72,30 +80,49 @@ class PlannerAgent:
         origin_upper = origin.upper().strip()
         dest_upper = destination.upper().strip()
 
+        sys_prompt = PLANNER_SYSTEM_PROMPT
+        if rejected_junctions:
+            sys_prompt += f" If rejected_junctions is provided, strictly DO NOT route through these stations: {rejected_junctions}."
+
         user_prompt = f"Plan a split journey route from {origin_upper} to {dest_upper} for travel date {date}."
+        if rejected_junctions:
+            user_prompt += f" Strictly avoid routing through these stations: {rejected_junctions}."
 
         self.trajectory.append({
             "step": "user_input",
             "prompt": user_prompt,
-            "system_prompt": PLANNER_SYSTEM_PROMPT
+            "system_prompt": sys_prompt
         })
+        get_logger().log_event("Planner", "prompt", {"prompt": user_prompt, "system_prompt": sys_prompt})
 
         # Check if live Gemini API is configured
         if GEMINI_API_KEY and HAS_GENAI:
-            response = self._run_llm_tool_loop(origin_upper, dest_upper, date, user_prompt)
+            response = self._run_llm_tool_loop(origin_upper, dest_upper, date, user_prompt, sys_prompt, rejected_junctions)
             if response:
                 return response.model_dump()
 
         # Deterministic tool-augmented fallback planner
-        return self._run_fallback_tool_planner(origin_upper, dest_upper, date)
+        return self._run_fallback_tool_planner(origin_upper, dest_upper, date, rejected_junctions)
 
-    def _run_llm_tool_loop(self, origin: str, destination: str, date: str, user_prompt: str) -> Optional[ProposedRouteResponse]:
+    def _run_llm_tool_loop(
+        self,
+        origin: str,
+        destination: str,
+        date: str,
+        user_prompt: str,
+        sys_prompt: str = PLANNER_SYSTEM_PROMPT,
+        rejected_junctions: Optional[List[str]] = None
+    ) -> Optional[ProposedRouteResponse]:
         """Runs function calling loop with google-genai SDK."""
         try:
             client = genai.Client(api_key=GEMINI_API_KEY)
             
             # Direct tool execution loop
             raw_candidates = find_split_junctions(origin, destination, max_layover_hrs=6)
+            if rejected_junctions:
+                rej_set = {j.upper() for j in rejected_junctions}
+                raw_candidates = [c for c in raw_candidates if c["junction"].upper() not in rej_set]
+
             self.trajectory.append({
                 "step": "tool_call",
                 "tool": "find_split_junctions",
@@ -113,7 +140,7 @@ Format this into candidate routes for {origin} -> {destination}.
                 model=self.model_name,
                 contents=format_prompt,
                 config=types.GenerateContentConfig(
-                    system_instruction=PLANNER_SYSTEM_PROMPT
+                    system_instruction=sys_prompt
                 )
             )
 
@@ -131,10 +158,22 @@ Format this into candidate routes for {origin} -> {destination}.
             })
             return None
 
-    def _run_fallback_tool_planner(self, origin: str, destination: str, date: str) -> Dict[str, Any]:
+    def _run_fallback_tool_planner(
+        self,
+        origin: str,
+        destination: str,
+        date: str,
+        rejected_junctions: Optional[List[str]] = None
+    ) -> Dict[str, Any]:
         """Executes tool-driven graph search fallback."""
         raw_candidates = find_split_junctions(origin, destination, max_layover_hrs=6)
+        if rejected_junctions:
+            rej_set = {j.upper() for j in rejected_junctions}
+            raw_candidates = [c for c in raw_candidates if c["junction"].upper() not in rej_set]
         
+        get_logger().log_event("Planner", "tool_call", {"tool": "find_split_junctions", "args": {"src": origin, "dest": destination, "max_layover_hrs": 6}})
+        get_logger().log_event("Planner", "tool_response", {"tool": "find_split_junctions", "result_count": len(raw_candidates), "candidates": raw_candidates[:3]})
+
         self.trajectory.append({
             "step": "tool_call",
             "tool": "find_split_junctions",

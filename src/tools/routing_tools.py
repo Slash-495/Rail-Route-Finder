@@ -4,11 +4,19 @@ Provides network graph traversal functions to find direct trains and candidate s
 """
 
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 import networkx as nx
 
 from src.config import TRAIN_NETWORK_JSON
+
+
+def calculate_duration_mins(dep_time: str, arr_time: str) -> int:
+    """Calculates journey duration in minutes, handling midnight wrap-around via modulo math."""
+    fmt = "%H:%M"
+    tdelta = datetime.strptime(arr_time, fmt) - datetime.strptime(dep_time, fmt)
+    return int((tdelta.total_seconds() % 86400) // 60)
 
 
 def _load_network_data(dataset_path: Path = TRAIN_NETWORK_JSON) -> Dict[str, Any]:
@@ -109,9 +117,9 @@ def find_split_junctions(src: str, dest: str, max_layover_hrs: int = 6) -> List[
                 layover = (dep2 + 1440) - arr1
 
             if 0 < layover <= max_layover_mins:
-                total_duration = (parse_time_to_minutes(t2["arrival_time"]) + t2.get("day_offset", 0) * 1440) - parse_time_to_minutes(t1["departure_time"])
-                if total_duration < 0:
-                    total_duration += 1440
+                dur1 = calculate_duration_mins(t1["departure_time"], t1["arrival_time"])
+                dur2 = calculate_duration_mins(t2["departure_time"], t2["arrival_time"])
+                total_duration = dur1 + layover + dur2
 
                 candidate_routes.append({
                     "junction": junc,

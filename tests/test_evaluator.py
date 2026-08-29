@@ -28,16 +28,17 @@ def test_baseline_and_agent_evaluator_runs():
     evaluator = BenchmarkEvaluator(test_cases_path=TEST_CASES_JSON, network_path=TRAIN_NETWORK_JSON)
     results = evaluator.run_evaluation()
 
-    assert "summary_metrics" in results
-    assert "detailed_case_results" in results
-    assert len(results["detailed_case_results"]) == 12
+    assert "zero_shot_llm_baseline" in results["summary_metrics"]
+    assert "heuristic_baseline" in results["summary_metrics"]
+    assert "agent" in results["summary_metrics"]
 
-    b_m = results["summary_metrics"]["baseline"]
+    b_llm = results["summary_metrics"]["zero_shot_llm_baseline"]
+    h_m = results["summary_metrics"]["heuristic_baseline"]
     a_m = results["summary_metrics"]["agent"]
 
     assert a_m["viable_route_found_rate"] == 100.0
     assert a_m["operational_feasibility_pass_rate"] == 100.0
-    assert b_m["operational_feasibility_pass_rate"] < 100.0  # Baseline fails on edge case traps
+    assert b_llm["operational_feasibility_pass_rate"] < 100.0  # Zero-shot LLM fails on edge case traps
 
 
 def test_evaluator_save_results(tmp_path):
