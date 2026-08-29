@@ -43,3 +43,26 @@ def test_planner_agent_max_3_candidates():
     agent = PlannerAgent()
     result = agent.plan_route(origin="NDLS", destination="CSMT")
     assert len(result["candidate_routes"]) <= 3
+
+
+def test_planner_respects_rejected_junctions():
+    agent = PlannerAgent()
+    # Route NDLS -> MAO normally yields CSMT candidate routes
+    normal_result = agent.plan_route(origin="NDLS", destination="MAO", date="2026-09-15")
+    assert any(c["junction"] == "CSMT" for c in normal_result["candidate_routes"])
+
+    # Now pass rejected_junctions=["CSMT"]
+    filtered_result = agent.plan_route(
+        origin="NDLS",
+        destination="MAO",
+        date="2026-09-15",
+        rejected_junctions=["CSMT"]
+    )
+    # Verify no candidate route uses CSMT
+    for candidate in filtered_result["candidate_routes"]:
+        assert candidate["junction"] != "CSMT"
+
+    # Verify that the trajectory log records the negative constraint in system prompt
+    trajectory = agent.get_trajectory()
+    user_input_step = next(s for s in trajectory if s.get("step") == "user_input")
+    assert "DO NOT route through these stations: ['CSMT']" in user_input_step["system_prompt"]

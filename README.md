@@ -39,9 +39,9 @@ flowchart TD
 ```
 
 ### Agent Responsibilities
-1. **PlannerAgent** ([`src/agents/planner_agent.py`](file:///c:/Users/arush/OneDrive/Desktop/rail-route-finder/src/agents/planner_agent.py)): Binds `find_split_junctions` and `find_direct_trains` graph tools to query 2-leg routes without hallucinating train schedules.
-2. **VerifierAgent** ([`src/agents/verifier_agent.py`](file:///c:/Users/arush/OneDrive/Desktop/rail-route-finder/src/agents/verifier_agent.py)): Acts as the grounded Critic. Binds `calculate_connection_risk` to audit P90 delay overflows and mandatory junction buffer limits ($60\text{m}$ for NDLS/CSMT/HWH, $45\text{m}$ for BPL/NGP/PUNE/JBP/ET). Rejects infeasible layovers and feeds exact critiques back to the Planner.
-3. **RankingAgent** ([`src/agents/ranking_agent.py`](file:///c:/Users/arush/OneDrive/Desktop/rail-route-finder/src/agents/ranking_agent.py)): Enriches valid routes with `predict_pnr_confirmation` scores and synthesizes a human-readable travel report analyzing trade-offs between Travel Time, Layover Safety, and Confirmation Chance.
+1. **PlannerAgent** ([`src/agents/planner_agent.py`](src/agents/planner_agent.py)): Binds `find_split_junctions` and `find_direct_trains` graph tools to query 2-leg routes without hallucinating train schedules.
+2. **VerifierAgent** ([`src/agents/verifier_agent.py`](src/agents/verifier_agent.py)): Acts as the grounded Critic. Binds `calculate_connection_risk` to audit P90 delay overflows and mandatory junction buffer limits ($60\text{m}$ for NDLS/CSMT/HWH, $45\text{m}$ for BPL/NGP/PUNE/JBP/ET). Rejects infeasible layovers and feeds exact critiques back to the Planner.
+3. **RankingAgent** ([`src/agents/ranking_agent.py`](src/agents/ranking_agent.py)): Enriches valid routes with `predict_pnr_confirmation` scores and synthesizes a human-readable travel report analyzing trade-offs between Travel Time, Layover Safety, and Confirmation Chance.
 
 > **Note**: The ML Scorer uses a deterministic heuristic proxy (exponential decay curve with class multipliers) standing in for a fitted quantile model, as no live PNR training data exists for a hackathon environment. This mimics a production architecture for conformal inventory prediction while remaining 100% reproducible offline.
 
