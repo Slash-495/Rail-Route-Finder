@@ -87,7 +87,17 @@ python -m src.main --origin NDLS --destination MAO --date 2026-09-05
 ```
 *(Use `--non-interactive` flag to skip prompt input).*
 
-### 5. Run Automated Test Suite
+### 5. Launch Streamlit Web UI Dashboard
+Launches the pristine, dark-mode friendly Streamlit web application:
+```bash
+# Recommended execution using the virtual environment:
+.venv\Scripts\python -m streamlit run app.py
+
+# Or after activating the virtual environment (.venv\Scripts\activate):
+streamlit run app.py
+```
+
+### 6. Run Automated Test Suite
 Executes unit tests verifying schemas, tools, ML scorer, agents, evaluator, and telemetry logger:
 ```bash
 pytest
