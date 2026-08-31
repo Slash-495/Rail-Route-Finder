@@ -27,6 +27,7 @@ TEST_CASES_JSON = BENCHMARKS_DIR / "test_cases.json"
 # Logs directory
 LOGS_DIR = BASE_DIR / "logs"
 TRAJECTORIES_DIR = LOGS_DIR / "trajectories"
+BENCHMARK_RESULTS_JSON = LOGS_DIR / "benchmark_results.json"
 
 # API keys and parameters
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
