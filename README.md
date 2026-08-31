@@ -108,6 +108,9 @@ streamlit run app.py
 ##### 3. Safest Layover Ranking & IRCTC Booking Safety Gate (Sandbox Action Safeguard)
 ![RailRouteAgent Streamlit Dashboard - NDLS to MAO Option 2 & Safety Gate](docs/images/streamlit_ndls_mao_option2_safety_gate.png)
 
+##### 4. Live Evaluation Metrics & Iteration Benchmark Performance Tab
+![RailRouteAgent Streamlit Dashboard - Live Evaluation Metrics Tab](docs/images/streamlit_evaluation_metrics.png)
+
 ### 6. Run Automated Test Suite
 Executes unit tests verifying schemas, tools, ML scorer, agents, evaluator, and telemetry logger:
 ```bash
