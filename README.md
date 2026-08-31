@@ -97,6 +97,17 @@ Launches the pristine, dark-mode friendly Streamlit web application:
 streamlit run app.py
 ```
 
+#### 🖥️ Streamlit Web Interface Showcase
+
+##### 1. Split-Journey Route Discovery (`NDLS` → `PUNE` via Junction `NGP`)
+![RailRouteAgent Streamlit Dashboard - NDLS to PUNE via NGP](docs/images/streamlit_ndls_pune_ngp.png)
+
+##### 2. Multi-Option Synthesis & Top Recommendation (`NDLS` → `MAO` via Junction `CSMT`)
+![RailRouteAgent Streamlit Dashboard - NDLS to MAO Option 1](docs/images/streamlit_ndls_mao_option1.png)
+
+##### 3. Safest Layover Ranking & IRCTC Booking Safety Gate (Sandbox Action Safeguard)
+![RailRouteAgent Streamlit Dashboard - NDLS to MAO Option 2 & Safety Gate](docs/images/streamlit_ndls_mao_option2_safety_gate.png)
+
 ### 6. Run Automated Test Suite
 Executes unit tests verifying schemas, tools, ML scorer, agents, evaluator, and telemetry logger:
 ```bash
