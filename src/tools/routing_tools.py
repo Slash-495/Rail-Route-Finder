@@ -1,13 +1,13 @@
 """
-Graph Routing Tools for RailRouteAgent.
-Provides network graph traversal functions to find direct trains and candidate split junctions.
+Routing Tools for RailRouteAgent.
+Provides optimized 2-hop heuristic search functions to find direct trains and candidate split junctions.
 """
 
 import json
 from datetime import datetime
+from functools import lru_cache
 from pathlib import Path
-from typing import List, Dict, Any, Optional
-import networkx as nx
+from typing import List, Dict, Any, Tuple, Optional
 
 from src.config import TRAIN_NETWORK_JSON
 
@@ -19,12 +19,31 @@ def calculate_duration_mins(dep_time: str, arr_time: str) -> int:
     return int((tdelta.total_seconds() % 86400) // 60)
 
 
+@lru_cache(maxsize=None)
 def _load_network_data(dataset_path: Path = TRAIN_NETWORK_JSON) -> Dict[str, Any]:
-    """Internal helper to load train network JSON dataset."""
+    """Internal helper to load train network JSON dataset cached in memory via LRU cache."""
     if not dataset_path.exists():
         return {"stations": [], "trains": []}
     with open(dataset_path, "r", encoding="utf-8") as f:
         return json.load(f)
+
+
+@lru_cache(maxsize=None)
+def _get_train_indexes() -> Tuple[Dict[str, List[Dict[str, Any]]], Dict[str, List[Dict[str, Any]]]]:
+    """Builds and caches station index dictionaries for O(1) lookups: (by_src, by_dest)."""
+    data = _load_network_data()
+    trains = data.get("trains", [])
+
+    by_src: Dict[str, List[Dict[str, Any]]] = {}
+    by_dest: Dict[str, List[Dict[str, Any]]] = {}
+
+    for t in trains:
+        src = t.get("src_station", "").upper()
+        dest = t.get("dest_station", "").upper()
+        by_src.setdefault(src, []).append(t)
+        by_dest.setdefault(dest, []).append(t)
+
+    return by_src, by_dest
 
 
 def parse_time_to_minutes(time_str: str) -> int:
@@ -41,7 +60,7 @@ def parse_time_to_minutes(time_str: str) -> int:
 
 
 def find_direct_trains(src: str, dest: str, date: str = "") -> List[Dict[str, Any]]:
-    """Finds all direct trains operating between source and destination stations.
+    """Finds all direct trains operating between source and destination stations using O(1) index lookup.
 
     Args:
         src: Origin station code (e.g. "NDLS", "CSMT").
@@ -51,22 +70,18 @@ def find_direct_trains(src: str, dest: str, date: str = "") -> List[Dict[str, An
     Returns:
         List[Dict[str, Any]]: List of direct train schedule dictionaries matching origin and destination.
     """
-    data = _load_network_data()
-    trains = data.get("trains", [])
+    by_src, _ = _get_train_indexes()
+    src_code = src.upper()
+    dest_code = dest.upper()
 
-    direct_matches = []
-    for t in trains:
-        if t.get("src_station") == src.upper() and t.get("dest_station") == dest.upper():
-            direct_matches.append(t)
-
-    return direct_matches
+    return [t for t in by_src.get(src_code, []) if t.get("dest_station", "").upper() == dest_code]
 
 
 def find_split_junctions(src: str, dest: str, max_layover_hrs: int = 6) -> List[Dict[str, Any]]:
     """Finds 2-leg split journey connections (A -> B -> C) between source and destination.
 
-    Traverses the train network graph strictly for valid candidate paths where
-    the scheduled layover at the intermediate junction station is within limit.
+    Uses an optimized 2-hop heuristic search indexed by station codes. Results are sorted
+    descending by layover safety buffer and ascending by total duration before returning.
 
     Args:
         src: Origin station code (e.g. "NDLS").
@@ -77,35 +92,28 @@ def find_split_junctions(src: str, dest: str, max_layover_hrs: int = 6) -> List[
         List[Dict[str, Any]]: List of candidate split itinerary dictionaries containing junction code,
         leg 1 train details, leg 2 train details, scheduled layover in minutes, and total duration.
     """
-    data = _load_network_data()
-    stations = data.get("stations", [])
-    trains = data.get("trains", [])
-
+    by_src, by_dest = _get_train_indexes()
     src_code = src.upper()
     dest_code = dest.upper()
     max_layover_mins = max_layover_hrs * 60
 
-    # Build NetworkX MultiDiGraph
-    G = nx.MultiDiGraph()
-    for s in stations:
-        G.add_node(s["code"], **s)
-
-    for tr in trains:
-        G.add_edge(tr["src_station"], tr["dest_station"], key=tr["train_no"], **tr)
-
     candidate_routes: List[Dict[str, Any]] = []
 
-    # Find first-leg candidates originating at src
-    first_legs = [t for t in trains if t["src_station"] == src_code]
-    second_legs = [t for t in trains if t["dest_station"] == dest_code]
+    first_legs = by_src.get(src_code, [])
+    second_legs_dest = by_dest.get(dest_code, [])
+
+    # Group second leg candidates by junction source station for O(1) matching
+    second_legs_by_junc: Dict[str, List[Dict[str, Any]]] = {}
+    for t2 in second_legs_dest:
+        junc_src = t2.get("src_station", "").upper()
+        second_legs_by_junc.setdefault(junc_src, []).append(t2)
 
     for t1 in first_legs:
-        junc = t1["dest_station"]
-        if junc == dest_code:
-            continue  # Skip direct routes
+        junc = t1.get("dest_station", "").upper()
+        if junc == dest_code or junc == src_code:
+            continue  # Skip direct or cyclic routes
 
-        # Matching second legs from junction to destination
-        matching_t2 = [t for t in second_legs if t["src_station"] == junc]
+        matching_t2 = second_legs_by_junc.get(junc, [])
 
         for t2 in matching_t2:
             arr1 = parse_time_to_minutes(t1["arrival_time"])
@@ -128,5 +136,8 @@ def find_split_junctions(src: str, dest: str, max_layover_hrs: int = 6) -> List[
                     "scheduled_layover_mins": layover,
                     "total_duration_mins": total_duration
                 })
+
+    # Sort candidates descending by layover safety buffer and ascending by total travel duration
+    candidate_routes.sort(key=lambda c: (-c["scheduled_layover_mins"], c["total_duration_mins"]))
 
     return candidate_routes

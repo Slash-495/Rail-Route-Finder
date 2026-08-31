@@ -13,7 +13,7 @@ Long-distance railway travel across India experiences massive demand spikes, lea
 - **The Tatkal Rush Impossible Manual Search**: Manually computing layover times, checking platform transfer buffers, accounting for historical delays, and booking 2 separate train tickets during tight Tatkal windows is cognitive overload and operationally impossible for human passengers.
 
 ### User Value Delivered
-`RailRouteAgent` automates multi-hop split journey planning by combining **deterministic graph traversal**, **dynamic junction transfer risk auditing**, **pure-Python ML PNR confirmation scoring**, and **multi-agent reflection loops**. Passengers get operationally guaranteed split itineraries that bypass waitlist bottlenecks with safe layovers.
+`RailRouteAgent` automates multi-hop split journey planning by combining **optimized 2-hop heuristic search**, **dynamic junction transfer risk auditing**, **pure-Python ML PNR confirmation scoring**, and **multi-agent reflection loops**. Passengers get operationally guaranteed split itineraries that bypass waitlist bottlenecks with safe layovers.
 
 ---
 
