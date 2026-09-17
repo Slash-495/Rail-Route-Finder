@@ -47,8 +47,10 @@ class TrajectoryLogger:
         Returns:
             Path: File path to exported JSON trajectory file.
         """
-        TRAJECTORIES_DIR.mkdir(parents=True, exist_ok=True)
-        file_path = TRAJECTORIES_DIR / f"run_{session_id}.json"
+        import os
+        export_dir = os.path.abspath(str(TRAJECTORIES_DIR))
+        os.makedirs(export_dir, exist_ok=True)
+        file_path = Path(export_dir) / f"run_{session_id}.json"
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(self.events, f, indent=2)
         return file_path
