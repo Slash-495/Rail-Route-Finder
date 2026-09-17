@@ -19,6 +19,7 @@ PROCESSED_DATA_DIR = DATA_DIR / "processed"
 
 # Main timetable dataset path
 TRAIN_NETWORK_JSON = PROCESSED_DATA_DIR / "train_network.json"
+TRAIN_NETWORK_CSV = PROCESSED_DATA_DIR / "train_network.csv"
 
 # Benchmarks directory
 BENCHMARKS_DIR = BASE_DIR / "benchmarks"

@@ -1,0 +1,59 @@
+train_no,train_name,src_station,dest_station,departure_time,arrival_time,day_offset,classes,avg_delay_mins,availability_status,confirmation_prob
+12952,New Delhi Rajdhani,NDLS,CSMT,16:55,08:35,1,"['1A', '2A', '3A']",15,AVAILABLE-0012,0.95
+12138,Punjab Mail,NDLS,CSMT,05:15,07:35,1,"['1A', '2A', '3A', 'SL']",45,WL-15,0.45
+12002,Bhopal Shatabdi,NDLS,BPL,06:00,14:05,0,"['EC', 'CC']",10,AVAILABLE-0042,0.98
+12628,Karnataka Express,NDLS,BPL,20:20,04:30,1,"['1A', '2A', '3A', 'SL']",25,GNWL-42,0.3
+12622,Tamil Nadu Express,NDLS,NGP,22:30,13:05,1,"['1A', '2A', '3A', 'SL']",30,AVAILABLE-0005,0.9
+12410,Gondwana Express,NDLS,JBP,15:05,03:00,1,"['2A', '3A', 'SL']",20,REGRET,0.05
+12802,Purushottam Express,NDLS,CNB,22:40,04:00,1,"['1A', '2A', '3A', 'SL']",35,AVAILABLE-0088,0.99
+12424,Dibrugarh Rajdhani,NDLS,PRYJ,16:20,23:10,0,"['1A', '2A', '3A']",15,AVAILABLE-0018,0.94
+12156,Shaan-e-Bhopal Express,BPL,NDLS,23:05,06:20,1,"['1A', '2A', '3A', 'SL']",10,AVAILABLE-0030,0.96
+12160,Jabalpur Express,BPL,JBP,22:00,03:30,1,"['2A', '3A', 'SL']",15,RAC-08,0.75
+12061,Jan Shatabdi Express,BPL,JBP,17:40,22:55,0,"['CC', '2S']",10,AVAILABLE-0120,0.99
+12616,Grand Trunk Express,BPL,NGP,03:20,08:35,0,"['1A', '2A', '3A', 'SL']",40,WL-28,0.35
+12137,Punjab Mail (Down),BPL,CSMT,09:55,19:35,0,"['1A', '2A', '3A', 'SL']",30,AVAILABLE-0015,0.91
+12190,Bhopal Express Trap,BPL,CSMT,14:15,23:55,0,"['2A', '3A']",5,AVAILABLE-0050,0.95
+12154,Vindhyachal Express,BPL,CSMT,05:20,15:30,0,"['2A', '3A', 'SL']",10,AVAILABLE-0020,0.9
+12290,Nagpur Duronto,NGP,CSMT,20:40,08:05,1,"['1A', '2A', '3A']",20,AVAILABLE-0004,0.88
+12106,Vidarbha Express,NGP,CSMT,17:00,06:15,1,"['1A', '2A', '3A', 'SL']",25,WL-08,0.6
+12114,Pune Garib Rath,NGP,PUNE,18:00,06:25,1,['3A'],15,AVAILABLE-0064,0.97
+12834,Howrah Express,NGP,HWH,19:00,13:25,1,"['2A', '3A', 'SL']",50,GNWL-19,0.4
+12187,Jabalpur Garib Rath,JBP,CSMT,19:50,12:20,1,['3A'],30,AVAILABLE-0022,0.93
+11072,Kamayani Express,JBP,BSB,15:30,23:45,0,"['2A', '3A', 'SL']",35,WL-12,0.5
+12124,Deccan Queen,CSMT,PUNE,17:10,20:25,0,"['CC', '2S']",5,AVAILABLE-0150,0.99
+11139,CSMT Gadag Express,CSMT,MAO,21:20,08:30,1,"['2A', '3A', 'SL']",25,AVAILABLE-0010,0.92
+10111,Konkan Kanya Express,CSMT,MAO,23:00,09:45,1,"['1A', '2A', '3A', 'SL']",20,WL-34,0.32
+12134,Mangaluru Express,MAO,CSMT,19:05,04:35,1,"['2A', '3A', 'SL']",15,AVAILABLE-0008,0.89
+12780,Goa Express,PUNE,MAO,16:35,05:40,1,"['2A', '3A', 'SL']",20,AVAILABLE-0025,0.95
+12130,Azad Hind Express,PUNE,NGP,18:35,09:15,1,"['2A', '3A', 'SL']",40,WL-52,0.25
+12779,Goa Express (Return),MAO,PUNE,15:00,03:55,1,"['2A', '3A', 'SL']",15,AVAILABLE-0018,0.94
+12304,Poorva Express,CNB,HWH,23:05,17:00,1,"['1A', '2A', '3A', 'SL']",60,REGRET,0.0
+12274,Howrah Duronto,PRYJ,HWH,01:15,12:40,0,"['1A', '2A', '3A']",20,AVAILABLE-0014,0.92
+12932,Ahmedabad Double Decker,ADI,CSMT,06:00,13:00,0,['CC'],10,AVAILABLE-0095,0.98
+12052,Mandovi Jan Shatabdi,CSMT,MAO,16:15,23:50,0,"['CC', '2S']",10,AVAILABLE-0060,0.98
+12050,Jan Shatabdi Express,CSMT,MAO,12:30,21:15,0,"['CC', '2S']",10,AVAILABLE-0040,0.95
+12149,Pune Jabalpur SF,PUNE,JBP,21:05,13:40,1,"['2A', '3A', 'SL']",20,AVAILABLE-0035,0.92
+12051,Goa Express (Morning),PUNE,MAO,08:45,18:30,0,"['2A', '3A', 'SL']",15,AVAILABLE-0040,0.94
+12809,Howrah Mail,NGP,HWH,11:30,05:45,1,"['1A', '2A', '3A', 'SL']",25,AVAILABLE-0025,0.9
+12322,Kolkata Mail via Jabalpur,CSMT,JBP,22:15,13:30,1,"['1A', '2A', '3A', 'SL']",15,AVAILABLE-0018,0.93
+12294,Prayagraj Duronto,PRYJ,CSMT,20:10,14:40,1,"['1A', '2A', '3A']",10,AVAILABLE-0012,0.96
+12280,Taj Express,NDLS,AGC,06:55,09:40,0,"['CC', '2S']",10,AVAILABLE-0080,0.97
+12722,Dakshin Express,AGC,BPL,12:00,19:40,0,"['1A', '2A', '3A', 'SL']",20,AVAILABLE-0035,0.92
+12721,Dakshin Express (Return),BPL,AGC,07:30,15:00,0,"['1A', '2A', '3A', 'SL']",20,AVAILABLE-0030,0.92
+12279,Taj Express (Return),AGC,NDLS,18:00,21:00,0,"['CC', '2S']",10,AVAILABLE-0075,0.97
+12004,Taj Shatabdi,NDLS,GWL,06:15,09:30,0,"['EC', 'CC']",10,AVAILABLE-0050,0.96
+11126,Gwalior Bhopal Intercity,GWL,BPL,11:45,17:15,0,"['2A', '3A', 'SL']",15,AVAILABLE-0025,0.91
+11125,Bhopal Gwalior Intercity,BPL,GWL,08:15,13:45,0,"['2A', '3A', 'SL']",15,AVAILABLE-0028,0.91
+12003,Taj Shatabdi (Return),GWL,NDLS,16:00,19:15,0,"['EC', 'CC']",10,AVAILABLE-0045,0.96
+22464,Bundelkhand SF Express,NDLS,VGLJ,07:00,11:30,0,"['2A', '3A', 'SL']",15,AVAILABLE-0045,0.93
+12184,Jhansi Bhopal Express,VGLJ,BPL,13:30,18:20,0,"['2A', '3A', 'SL']",15,AVAILABLE-0030,0.9
+12183,Bhopal Jhansi Express,BPL,VGLJ,09:00,13:50,0,"['2A', '3A', 'SL']",15,AVAILABLE-0032,0.9
+22463,Bundelkhand SF (Return),VGLJ,NDLS,15:30,20:00,0,"['2A', '3A', 'SL']",15,AVAILABLE-0040,0.93
+12060,Kota Janshatabdi,NDLS,KOTA,12:45,18:15,0,"['CC', '2S']",10,AVAILABLE-0065,0.95
+19804,Kota Bhopal Passenger Express,KOTA,BPL,20:00,02:30,1,"['2A', '3A', 'SL']",25,AVAILABLE-0020,0.88
+19803,Bhopal Kota Passenger Express,BPL,KOTA,06:00,12:30,0,"['2A', '3A', 'SL']",25,AVAILABLE-0022,0.88
+12059,Kota Janshatabdi (Return),KOTA,NDLS,14:30,20:05,0,"['CC', '2S']",10,AVAILABLE-0060,0.95
+12742,Goa Superfast Express,BPL,MAO,16:40,09:30,1,"['1A', '2A', '3A', 'SL']",25,AVAILABLE-0024,0.94
+12741,Goa Superfast Return,MAO,BPL,18:00,11:15,1,"['1A', '2A', '3A', 'SL']",25,AVAILABLE-0020,0.92
+12951,Mumbai Rajdhani (Up),CSMT,NDLS,17:00,08:35,1,"['1A', '2A', '3A']",15,AVAILABLE-0020,0.95
+12139,Punjab Mail (Up),CSMT,NDLS,19:35,21:10,1,"['1A', '2A', '3A', 'SL']",40,AVAILABLE-0010,0.88

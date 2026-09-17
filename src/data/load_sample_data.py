@@ -401,12 +401,18 @@ def generate_sample_dataset() -> Dict[str, Any]:
 
 
 def save_dataset(output_path: Path = TRAIN_NETWORK_JSON) -> Dict[str, Any]:
-    """Generate and write train network JSON dataset to file."""
+    """Generate and write train network JSON and CSV datasets to file."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
     dataset = generate_sample_dataset()
     
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(dataset, f, indent=2)
+
+    # Persist actual railway CSV dataset for direct Pandas analysis
+    csv_path = output_path.parent / "train_network.csv"
+    import pandas as pd
+    df_trains = pd.DataFrame(dataset["trains"])
+    df_trains.to_csv(csv_path, index=False)
 
     return dataset
 
