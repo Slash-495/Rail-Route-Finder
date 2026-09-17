@@ -2,6 +2,11 @@
 
 > An agentic Indian Railways (IRCTC) split-journey planner designed to uncover high-probability, operationally safe transfer itineraries when direct train tickets are sold out or heavily waitlisted.
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://rail-route-finder.streamlit.app/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-rail--route--finder.streamlit.app-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://rail-route-finder.streamlit.app/)
+
+🌐 **Live Web Application**: [https://rail-route-finder.streamlit.app/](https://rail-route-finder.streamlit.app/)
+
 ---
 
 ## 🎯 The Problem & User Value
@@ -127,7 +132,10 @@ python -m src.main --origin NDLS --destination MAO --date 2026-09-05
 *(Use `--non-interactive` flag to skip prompt input).*
 
 ### 5. Launch Streamlit Web UI Dashboard
-Launches the pristine, dark-mode friendly Streamlit web application:
+
+🌐 **Live Deployment**: Access the live interactive web app directly at **[rail-route-finder.streamlit.app](https://rail-route-finder.streamlit.app/)**.
+
+Or launch the pristine, dark-mode friendly Streamlit web application locally:
 ```bash
 # Recommended execution using the virtual environment:
 .venv\Scripts\python -m streamlit run app.py
