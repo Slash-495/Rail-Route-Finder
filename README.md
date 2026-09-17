@@ -111,6 +111,9 @@ streamlit run app.py
 ##### 4. Live Evaluation Metrics & Iteration Benchmark Performance Tab
 ![RailRouteAgent Streamlit Dashboard - Live Evaluation Metrics Tab](docs/images/streamlit_evaluation_metrics.png)
 
+##### 5. Execution Trajectory Viewer Tab (Step-by-Step Agent Telemetry)
+![RailRouteAgent Streamlit Dashboard - Execution Trajectory Viewer](docs/images/streamlit_trajectory_viewer.png)
+
 ### 6. Run Automated Test Suite
 Executes unit tests verifying schemas, tools, ML scorer, agents, evaluator, and telemetry logger:
 ```bash
