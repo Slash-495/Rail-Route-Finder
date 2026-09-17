@@ -155,9 +155,11 @@ streamlit run app.py
 
 ### 6. Run Automated Test Suite
 Executes unit tests verifying schemas, tools, ML scorer, agents, evaluator, and telemetry logger:
+
 ```bash
 pytest
 ```
+##### Note : Due to strict API restrictions, the live demo runs on a sampled graph dataset to demonstrate the multi-agent reasoning and tool-calling architecture. The core engine is dataset-agnostic and scalable.
 
 ---
 
