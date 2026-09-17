@@ -34,11 +34,21 @@ DEFAULT_JUNCTION_BUFFER_MINS: int = 30
 
 
 def _load_network_data(dataset_path: Path = TRAIN_NETWORK_JSON) -> Dict[str, Any]:
-    """Internal helper to load train network dataset."""
-    if not dataset_path.exists():
-        return {"stations": [], "trains": []}
-    with open(dataset_path, "r", encoding="utf-8") as f:
-        return json.load(f)
+    """Internal helper to load train network dataset.
+
+    If dataset file is missing (e.g. fresh clone on Streamlit Cloud), dynamically
+    generates and persists the sample dataset instead of returning empty data.
+    """
+    if dataset_path and Path(dataset_path).exists():
+        with open(dataset_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+
+    try:
+        from src.data.load_sample_data import generate_sample_dataset, save_dataset
+        return save_dataset(Path(dataset_path))
+    except Exception:
+        from src.data.load_sample_data import generate_sample_dataset
+        return generate_sample_dataset()
 
 
 def get_dynamic_junction_buffer(station_code: str) -> int:

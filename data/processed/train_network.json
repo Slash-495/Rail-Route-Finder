@@ -1,0 +1,1094 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "description": "Synthetic Indian Railways timetable network for RailRouteAgent",
+    "station_count": 16,
+    "train_route_count": 58,
+    "is_connected": true
+  },
+  "stations": [
+    {
+      "code": "NDLS",
+      "name": "New Delhi",
+      "zone": "NR",
+      "platforms": 16
+    },
+    {
+      "code": "CSMT",
+      "name": "Mumbai CSMT",
+      "zone": "CR",
+      "platforms": 18
+    },
+    {
+      "code": "BPL",
+      "name": "Bhopal Junction",
+      "zone": "WCR",
+      "platforms": 6
+    },
+    {
+      "code": "NGP",
+      "name": "Nagpur Junction",
+      "zone": "CR",
+      "platforms": 8
+    },
+    {
+      "code": "JBP",
+      "name": "Jabalpur Junction",
+      "zone": "WCR",
+      "platforms": 6
+    },
+    {
+      "code": "MAO",
+      "name": "Madgaon Junction",
+      "zone": "KR",
+      "platforms": 4
+    },
+    {
+      "code": "PUNE",
+      "name": "Pune Junction",
+      "zone": "CR",
+      "platforms": 6
+    },
+    {
+      "code": "CNB",
+      "name": "Kanpur Central",
+      "zone": "NCR",
+      "platforms": 10
+    },
+    {
+      "code": "PRYJ",
+      "name": "Prayagraj Junction",
+      "zone": "NCR",
+      "platforms": 10
+    },
+    {
+      "code": "BSB",
+      "name": "Varanasi Junction",
+      "zone": "NR",
+      "platforms": 9
+    },
+    {
+      "code": "HWH",
+      "name": "Howrah Junction",
+      "zone": "ER",
+      "platforms": 23
+    },
+    {
+      "code": "ADI",
+      "name": "Ahmedabad Junction",
+      "zone": "WR",
+      "platforms": 12
+    },
+    {
+      "code": "AGC",
+      "name": "Agra Cantt",
+      "zone": "NCR",
+      "platforms": 6
+    },
+    {
+      "code": "GWL",
+      "name": "Gwalior Junction",
+      "zone": "NCR",
+      "platforms": 4
+    },
+    {
+      "code": "VGLJ",
+      "name": "Virangana Lakshmibai Jhansi",
+      "zone": "NCR",
+      "platforms": 8
+    },
+    {
+      "code": "KOTA",
+      "name": "Kota Junction",
+      "zone": "WCR",
+      "platforms": 6
+    }
+  ],
+  "trains": [
+    {
+      "train_no": "12952",
+      "train_name": "New Delhi Rajdhani",
+      "src_station": "NDLS",
+      "dest_station": "CSMT",
+      "departure_time": "16:55",
+      "arrival_time": "08:35",
+      "day_offset": 1,
+      "classes": [
+        "1A",
+        "2A",
+        "3A"
+      ],
+      "avg_delay_mins": 15,
+      "availability_status": "AVAILABLE-0012",
+      "confirmation_prob": 0.95
+    },
+    {
+      "train_no": "12138",
+      "train_name": "Punjab Mail",
+      "src_station": "NDLS",
+      "dest_station": "CSMT",
+      "departure_time": "05:15",
+      "arrival_time": "07:35",
+      "day_offset": 1,
+      "classes": [
+        "1A",
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 45,
+      "availability_status": "WL-15",
+      "confirmation_prob": 0.45
+    },
+    {
+      "train_no": "12002",
+      "train_name": "Bhopal Shatabdi",
+      "src_station": "NDLS",
+      "dest_station": "BPL",
+      "departure_time": "06:00",
+      "arrival_time": "14:05",
+      "day_offset": 0,
+      "classes": [
+        "EC",
+        "CC"
+      ],
+      "avg_delay_mins": 10,
+      "availability_status": "AVAILABLE-0042",
+      "confirmation_prob": 0.98
+    },
+    {
+      "train_no": "12628",
+      "train_name": "Karnataka Express",
+      "src_station": "NDLS",
+      "dest_station": "BPL",
+      "departure_time": "20:20",
+      "arrival_time": "04:30",
+      "day_offset": 1,
+      "classes": [
+        "1A",
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 25,
+      "availability_status": "GNWL-42",
+      "confirmation_prob": 0.3
+    },
+    {
+      "train_no": "12622",
+      "train_name": "Tamil Nadu Express",
+      "src_station": "NDLS",
+      "dest_station": "NGP",
+      "departure_time": "22:30",
+      "arrival_time": "13:05",
+      "day_offset": 1,
+      "classes": [
+        "1A",
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 30,
+      "availability_status": "AVAILABLE-0005",
+      "confirmation_prob": 0.9
+    },
+    {
+      "train_no": "12410",
+      "train_name": "Gondwana Express",
+      "src_station": "NDLS",
+      "dest_station": "JBP",
+      "departure_time": "15:05",
+      "arrival_time": "03:00",
+      "day_offset": 1,
+      "classes": [
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 20,
+      "availability_status": "REGRET",
+      "confirmation_prob": 0.05
+    },
+    {
+      "train_no": "12802",
+      "train_name": "Purushottam Express",
+      "src_station": "NDLS",
+      "dest_station": "CNB",
+      "departure_time": "22:40",
+      "arrival_time": "04:00",
+      "day_offset": 1,
+      "classes": [
+        "1A",
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 35,
+      "availability_status": "AVAILABLE-0088",
+      "confirmation_prob": 0.99
+    },
+    {
+      "train_no": "12424",
+      "train_name": "Dibrugarh Rajdhani",
+      "src_station": "NDLS",
+      "dest_station": "PRYJ",
+      "departure_time": "16:20",
+      "arrival_time": "23:10",
+      "day_offset": 0,
+      "classes": [
+        "1A",
+        "2A",
+        "3A"
+      ],
+      "avg_delay_mins": 15,
+      "availability_status": "AVAILABLE-0018",
+      "confirmation_prob": 0.94
+    },
+    {
+      "train_no": "12156",
+      "train_name": "Shaan-e-Bhopal Express",
+      "src_station": "BPL",
+      "dest_station": "NDLS",
+      "departure_time": "23:05",
+      "arrival_time": "06:20",
+      "day_offset": 1,
+      "classes": [
+        "1A",
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 10,
+      "availability_status": "AVAILABLE-0030",
+      "confirmation_prob": 0.96
+    },
+    {
+      "train_no": "12160",
+      "train_name": "Jabalpur Express",
+      "src_station": "BPL",
+      "dest_station": "JBP",
+      "departure_time": "22:00",
+      "arrival_time": "03:30",
+      "day_offset": 1,
+      "classes": [
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 15,
+      "availability_status": "RAC-08",
+      "confirmation_prob": 0.75
+    },
+    {
+      "train_no": "12061",
+      "train_name": "Jan Shatabdi Express",
+      "src_station": "BPL",
+      "dest_station": "JBP",
+      "departure_time": "17:40",
+      "arrival_time": "22:55",
+      "day_offset": 0,
+      "classes": [
+        "CC",
+        "2S"
+      ],
+      "avg_delay_mins": 10,
+      "availability_status": "AVAILABLE-0120",
+      "confirmation_prob": 0.99
+    },
+    {
+      "train_no": "12616",
+      "train_name": "Grand Trunk Express",
+      "src_station": "BPL",
+      "dest_station": "NGP",
+      "departure_time": "03:20",
+      "arrival_time": "08:35",
+      "day_offset": 0,
+      "classes": [
+        "1A",
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 40,
+      "availability_status": "WL-28",
+      "confirmation_prob": 0.35
+    },
+    {
+      "train_no": "12137",
+      "train_name": "Punjab Mail (Down)",
+      "src_station": "BPL",
+      "dest_station": "CSMT",
+      "departure_time": "09:55",
+      "arrival_time": "19:35",
+      "day_offset": 0,
+      "classes": [
+        "1A",
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 30,
+      "availability_status": "AVAILABLE-0015",
+      "confirmation_prob": 0.91
+    },
+    {
+      "train_no": "12190",
+      "train_name": "Bhopal Express Trap",
+      "src_station": "BPL",
+      "dest_station": "CSMT",
+      "departure_time": "14:15",
+      "arrival_time": "23:55",
+      "day_offset": 0,
+      "classes": [
+        "2A",
+        "3A"
+      ],
+      "avg_delay_mins": 5,
+      "availability_status": "AVAILABLE-0050",
+      "confirmation_prob": 0.95
+    },
+    {
+      "train_no": "12154",
+      "train_name": "Vindhyachal Express",
+      "src_station": "BPL",
+      "dest_station": "CSMT",
+      "departure_time": "05:20",
+      "arrival_time": "15:30",
+      "day_offset": 0,
+      "classes": [
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 10,
+      "availability_status": "AVAILABLE-0020",
+      "confirmation_prob": 0.9
+    },
+    {
+      "train_no": "12290",
+      "train_name": "Nagpur Duronto",
+      "src_station": "NGP",
+      "dest_station": "CSMT",
+      "departure_time": "20:40",
+      "arrival_time": "08:05",
+      "day_offset": 1,
+      "classes": [
+        "1A",
+        "2A",
+        "3A"
+      ],
+      "avg_delay_mins": 20,
+      "availability_status": "AVAILABLE-0004",
+      "confirmation_prob": 0.88
+    },
+    {
+      "train_no": "12106",
+      "train_name": "Vidarbha Express",
+      "src_station": "NGP",
+      "dest_station": "CSMT",
+      "departure_time": "17:00",
+      "arrival_time": "06:15",
+      "day_offset": 1,
+      "classes": [
+        "1A",
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 25,
+      "availability_status": "WL-08",
+      "confirmation_prob": 0.6
+    },
+    {
+      "train_no": "12114",
+      "train_name": "Pune Garib Rath",
+      "src_station": "NGP",
+      "dest_station": "PUNE",
+      "departure_time": "18:00",
+      "arrival_time": "06:25",
+      "day_offset": 1,
+      "classes": [
+        "3A"
+      ],
+      "avg_delay_mins": 15,
+      "availability_status": "AVAILABLE-0064",
+      "confirmation_prob": 0.97
+    },
+    {
+      "train_no": "12834",
+      "train_name": "Howrah Express",
+      "src_station": "NGP",
+      "dest_station": "HWH",
+      "departure_time": "19:00",
+      "arrival_time": "13:25",
+      "day_offset": 1,
+      "classes": [
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 50,
+      "availability_status": "GNWL-19",
+      "confirmation_prob": 0.4
+    },
+    {
+      "train_no": "12187",
+      "train_name": "Jabalpur Garib Rath",
+      "src_station": "JBP",
+      "dest_station": "CSMT",
+      "departure_time": "19:50",
+      "arrival_time": "12:20",
+      "day_offset": 1,
+      "classes": [
+        "3A"
+      ],
+      "avg_delay_mins": 30,
+      "availability_status": "AVAILABLE-0022",
+      "confirmation_prob": 0.93
+    },
+    {
+      "train_no": "11072",
+      "train_name": "Kamayani Express",
+      "src_station": "JBP",
+      "dest_station": "BSB",
+      "departure_time": "15:30",
+      "arrival_time": "23:45",
+      "day_offset": 0,
+      "classes": [
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 35,
+      "availability_status": "WL-12",
+      "confirmation_prob": 0.5
+    },
+    {
+      "train_no": "12124",
+      "train_name": "Deccan Queen",
+      "src_station": "CSMT",
+      "dest_station": "PUNE",
+      "departure_time": "17:10",
+      "arrival_time": "20:25",
+      "day_offset": 0,
+      "classes": [
+        "CC",
+        "2S"
+      ],
+      "avg_delay_mins": 5,
+      "availability_status": "AVAILABLE-0150",
+      "confirmation_prob": 0.99
+    },
+    {
+      "train_no": "11139",
+      "train_name": "CSMT Gadag Express",
+      "src_station": "CSMT",
+      "dest_station": "MAO",
+      "departure_time": "21:20",
+      "arrival_time": "08:30",
+      "day_offset": 1,
+      "classes": [
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 25,
+      "availability_status": "AVAILABLE-0010",
+      "confirmation_prob": 0.92
+    },
+    {
+      "train_no": "10111",
+      "train_name": "Konkan Kanya Express",
+      "src_station": "CSMT",
+      "dest_station": "MAO",
+      "departure_time": "23:00",
+      "arrival_time": "09:45",
+      "day_offset": 1,
+      "classes": [
+        "1A",
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 20,
+      "availability_status": "WL-34",
+      "confirmation_prob": 0.32
+    },
+    {
+      "train_no": "12134",
+      "train_name": "Mangaluru Express",
+      "src_station": "MAO",
+      "dest_station": "CSMT",
+      "departure_time": "19:05",
+      "arrival_time": "04:35",
+      "day_offset": 1,
+      "classes": [
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 15,
+      "availability_status": "AVAILABLE-0008",
+      "confirmation_prob": 0.89
+    },
+    {
+      "train_no": "12780",
+      "train_name": "Goa Express",
+      "src_station": "PUNE",
+      "dest_station": "MAO",
+      "departure_time": "16:35",
+      "arrival_time": "05:40",
+      "day_offset": 1,
+      "classes": [
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 20,
+      "availability_status": "AVAILABLE-0025",
+      "confirmation_prob": 0.95
+    },
+    {
+      "train_no": "12130",
+      "train_name": "Azad Hind Express",
+      "src_station": "PUNE",
+      "dest_station": "NGP",
+      "departure_time": "18:35",
+      "arrival_time": "09:15",
+      "day_offset": 1,
+      "classes": [
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 40,
+      "availability_status": "WL-52",
+      "confirmation_prob": 0.25
+    },
+    {
+      "train_no": "12779",
+      "train_name": "Goa Express (Return)",
+      "src_station": "MAO",
+      "dest_station": "PUNE",
+      "departure_time": "15:00",
+      "arrival_time": "03:55",
+      "day_offset": 1,
+      "classes": [
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 15,
+      "availability_status": "AVAILABLE-0018",
+      "confirmation_prob": 0.94
+    },
+    {
+      "train_no": "12304",
+      "train_name": "Poorva Express",
+      "src_station": "CNB",
+      "dest_station": "HWH",
+      "departure_time": "23:05",
+      "arrival_time": "17:00",
+      "day_offset": 1,
+      "classes": [
+        "1A",
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 60,
+      "availability_status": "REGRET",
+      "confirmation_prob": 0.0
+    },
+    {
+      "train_no": "12274",
+      "train_name": "Howrah Duronto",
+      "src_station": "PRYJ",
+      "dest_station": "HWH",
+      "departure_time": "01:15",
+      "arrival_time": "12:40",
+      "day_offset": 0,
+      "classes": [
+        "1A",
+        "2A",
+        "3A"
+      ],
+      "avg_delay_mins": 20,
+      "availability_status": "AVAILABLE-0014",
+      "confirmation_prob": 0.92
+    },
+    {
+      "train_no": "12932",
+      "train_name": "Ahmedabad Double Decker",
+      "src_station": "ADI",
+      "dest_station": "CSMT",
+      "departure_time": "06:00",
+      "arrival_time": "13:00",
+      "day_offset": 0,
+      "classes": [
+        "CC"
+      ],
+      "avg_delay_mins": 10,
+      "availability_status": "AVAILABLE-0095",
+      "confirmation_prob": 0.98
+    },
+    {
+      "train_no": "12052",
+      "train_name": "Mandovi Jan Shatabdi",
+      "src_station": "CSMT",
+      "dest_station": "MAO",
+      "departure_time": "16:15",
+      "arrival_time": "23:50",
+      "day_offset": 0,
+      "classes": [
+        "CC",
+        "2S"
+      ],
+      "avg_delay_mins": 10,
+      "availability_status": "AVAILABLE-0060",
+      "confirmation_prob": 0.98
+    },
+    {
+      "train_no": "12050",
+      "train_name": "Jan Shatabdi Express",
+      "src_station": "CSMT",
+      "dest_station": "MAO",
+      "departure_time": "12:30",
+      "arrival_time": "21:15",
+      "day_offset": 0,
+      "classes": [
+        "CC",
+        "2S"
+      ],
+      "avg_delay_mins": 10,
+      "availability_status": "AVAILABLE-0040",
+      "confirmation_prob": 0.95
+    },
+    {
+      "train_no": "12149",
+      "train_name": "Pune Jabalpur SF",
+      "src_station": "PUNE",
+      "dest_station": "JBP",
+      "departure_time": "21:05",
+      "arrival_time": "13:40",
+      "day_offset": 1,
+      "classes": [
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 20,
+      "availability_status": "AVAILABLE-0035",
+      "confirmation_prob": 0.92
+    },
+    {
+      "train_no": "12051",
+      "train_name": "Goa Express (Morning)",
+      "src_station": "PUNE",
+      "dest_station": "MAO",
+      "departure_time": "08:45",
+      "arrival_time": "18:30",
+      "day_offset": 0,
+      "classes": [
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 15,
+      "availability_status": "AVAILABLE-0040",
+      "confirmation_prob": 0.94
+    },
+    {
+      "train_no": "12809",
+      "train_name": "Howrah Mail",
+      "src_station": "NGP",
+      "dest_station": "HWH",
+      "departure_time": "11:30",
+      "arrival_time": "05:45",
+      "day_offset": 1,
+      "classes": [
+        "1A",
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 25,
+      "availability_status": "AVAILABLE-0025",
+      "confirmation_prob": 0.9
+    },
+    {
+      "train_no": "12322",
+      "train_name": "Kolkata Mail via Jabalpur",
+      "src_station": "CSMT",
+      "dest_station": "JBP",
+      "departure_time": "22:15",
+      "arrival_time": "13:30",
+      "day_offset": 1,
+      "classes": [
+        "1A",
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 15,
+      "availability_status": "AVAILABLE-0018",
+      "confirmation_prob": 0.93
+    },
+    {
+      "train_no": "12294",
+      "train_name": "Prayagraj Duronto",
+      "src_station": "PRYJ",
+      "dest_station": "CSMT",
+      "departure_time": "20:10",
+      "arrival_time": "14:40",
+      "day_offset": 1,
+      "classes": [
+        "1A",
+        "2A",
+        "3A"
+      ],
+      "avg_delay_mins": 10,
+      "availability_status": "AVAILABLE-0012",
+      "confirmation_prob": 0.96
+    },
+    {
+      "train_no": "12280",
+      "train_name": "Taj Express",
+      "src_station": "NDLS",
+      "dest_station": "AGC",
+      "departure_time": "06:55",
+      "arrival_time": "09:40",
+      "day_offset": 0,
+      "classes": [
+        "CC",
+        "2S"
+      ],
+      "avg_delay_mins": 10,
+      "availability_status": "AVAILABLE-0080",
+      "confirmation_prob": 0.97
+    },
+    {
+      "train_no": "12722",
+      "train_name": "Dakshin Express",
+      "src_station": "AGC",
+      "dest_station": "BPL",
+      "departure_time": "12:00",
+      "arrival_time": "19:40",
+      "day_offset": 0,
+      "classes": [
+        "1A",
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 20,
+      "availability_status": "AVAILABLE-0035",
+      "confirmation_prob": 0.92
+    },
+    {
+      "train_no": "12721",
+      "train_name": "Dakshin Express (Return)",
+      "src_station": "BPL",
+      "dest_station": "AGC",
+      "departure_time": "07:30",
+      "arrival_time": "15:00",
+      "day_offset": 0,
+      "classes": [
+        "1A",
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 20,
+      "availability_status": "AVAILABLE-0030",
+      "confirmation_prob": 0.92
+    },
+    {
+      "train_no": "12279",
+      "train_name": "Taj Express (Return)",
+      "src_station": "AGC",
+      "dest_station": "NDLS",
+      "departure_time": "18:00",
+      "arrival_time": "21:00",
+      "day_offset": 0,
+      "classes": [
+        "CC",
+        "2S"
+      ],
+      "avg_delay_mins": 10,
+      "availability_status": "AVAILABLE-0075",
+      "confirmation_prob": 0.97
+    },
+    {
+      "train_no": "12004",
+      "train_name": "Taj Shatabdi",
+      "src_station": "NDLS",
+      "dest_station": "GWL",
+      "departure_time": "06:15",
+      "arrival_time": "09:30",
+      "day_offset": 0,
+      "classes": [
+        "EC",
+        "CC"
+      ],
+      "avg_delay_mins": 10,
+      "availability_status": "AVAILABLE-0050",
+      "confirmation_prob": 0.96
+    },
+    {
+      "train_no": "11126",
+      "train_name": "Gwalior Bhopal Intercity",
+      "src_station": "GWL",
+      "dest_station": "BPL",
+      "departure_time": "11:45",
+      "arrival_time": "17:15",
+      "day_offset": 0,
+      "classes": [
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 15,
+      "availability_status": "AVAILABLE-0025",
+      "confirmation_prob": 0.91
+    },
+    {
+      "train_no": "11125",
+      "train_name": "Bhopal Gwalior Intercity",
+      "src_station": "BPL",
+      "dest_station": "GWL",
+      "departure_time": "08:15",
+      "arrival_time": "13:45",
+      "day_offset": 0,
+      "classes": [
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 15,
+      "availability_status": "AVAILABLE-0028",
+      "confirmation_prob": 0.91
+    },
+    {
+      "train_no": "12003",
+      "train_name": "Taj Shatabdi (Return)",
+      "src_station": "GWL",
+      "dest_station": "NDLS",
+      "departure_time": "16:00",
+      "arrival_time": "19:15",
+      "day_offset": 0,
+      "classes": [
+        "EC",
+        "CC"
+      ],
+      "avg_delay_mins": 10,
+      "availability_status": "AVAILABLE-0045",
+      "confirmation_prob": 0.96
+    },
+    {
+      "train_no": "22464",
+      "train_name": "Bundelkhand SF Express",
+      "src_station": "NDLS",
+      "dest_station": "VGLJ",
+      "departure_time": "07:00",
+      "arrival_time": "11:30",
+      "day_offset": 0,
+      "classes": [
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 15,
+      "availability_status": "AVAILABLE-0045",
+      "confirmation_prob": 0.93
+    },
+    {
+      "train_no": "12184",
+      "train_name": "Jhansi Bhopal Express",
+      "src_station": "VGLJ",
+      "dest_station": "BPL",
+      "departure_time": "13:30",
+      "arrival_time": "18:20",
+      "day_offset": 0,
+      "classes": [
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 15,
+      "availability_status": "AVAILABLE-0030",
+      "confirmation_prob": 0.9
+    },
+    {
+      "train_no": "12183",
+      "train_name": "Bhopal Jhansi Express",
+      "src_station": "BPL",
+      "dest_station": "VGLJ",
+      "departure_time": "09:00",
+      "arrival_time": "13:50",
+      "day_offset": 0,
+      "classes": [
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 15,
+      "availability_status": "AVAILABLE-0032",
+      "confirmation_prob": 0.9
+    },
+    {
+      "train_no": "22463",
+      "train_name": "Bundelkhand SF (Return)",
+      "src_station": "VGLJ",
+      "dest_station": "NDLS",
+      "departure_time": "15:30",
+      "arrival_time": "20:00",
+      "day_offset": 0,
+      "classes": [
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 15,
+      "availability_status": "AVAILABLE-0040",
+      "confirmation_prob": 0.93
+    },
+    {
+      "train_no": "12060",
+      "train_name": "Kota Janshatabdi",
+      "src_station": "NDLS",
+      "dest_station": "KOTA",
+      "departure_time": "12:45",
+      "arrival_time": "18:15",
+      "day_offset": 0,
+      "classes": [
+        "CC",
+        "2S"
+      ],
+      "avg_delay_mins": 10,
+      "availability_status": "AVAILABLE-0065",
+      "confirmation_prob": 0.95
+    },
+    {
+      "train_no": "19804",
+      "train_name": "Kota Bhopal Passenger Express",
+      "src_station": "KOTA",
+      "dest_station": "BPL",
+      "departure_time": "20:00",
+      "arrival_time": "02:30",
+      "day_offset": 1,
+      "classes": [
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 25,
+      "availability_status": "AVAILABLE-0020",
+      "confirmation_prob": 0.88
+    },
+    {
+      "train_no": "19803",
+      "train_name": "Bhopal Kota Passenger Express",
+      "src_station": "BPL",
+      "dest_station": "KOTA",
+      "departure_time": "06:00",
+      "arrival_time": "12:30",
+      "day_offset": 0,
+      "classes": [
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 25,
+      "availability_status": "AVAILABLE-0022",
+      "confirmation_prob": 0.88
+    },
+    {
+      "train_no": "12059",
+      "train_name": "Kota Janshatabdi (Return)",
+      "src_station": "KOTA",
+      "dest_station": "NDLS",
+      "departure_time": "14:30",
+      "arrival_time": "20:05",
+      "day_offset": 0,
+      "classes": [
+        "CC",
+        "2S"
+      ],
+      "avg_delay_mins": 10,
+      "availability_status": "AVAILABLE-0060",
+      "confirmation_prob": 0.95
+    },
+    {
+      "train_no": "12742",
+      "train_name": "Goa Superfast Express",
+      "src_station": "BPL",
+      "dest_station": "MAO",
+      "departure_time": "16:40",
+      "arrival_time": "09:30",
+      "day_offset": 1,
+      "classes": [
+        "1A",
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 25,
+      "availability_status": "AVAILABLE-0024",
+      "confirmation_prob": 0.94
+    },
+    {
+      "train_no": "12741",
+      "train_name": "Goa Superfast Return",
+      "src_station": "MAO",
+      "dest_station": "BPL",
+      "departure_time": "18:00",
+      "arrival_time": "11:15",
+      "day_offset": 1,
+      "classes": [
+        "1A",
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 25,
+      "availability_status": "AVAILABLE-0020",
+      "confirmation_prob": 0.92
+    },
+    {
+      "train_no": "12951",
+      "train_name": "Mumbai Rajdhani (Up)",
+      "src_station": "CSMT",
+      "dest_station": "NDLS",
+      "departure_time": "17:00",
+      "arrival_time": "08:35",
+      "day_offset": 1,
+      "classes": [
+        "1A",
+        "2A",
+        "3A"
+      ],
+      "avg_delay_mins": 15,
+      "availability_status": "AVAILABLE-0020",
+      "confirmation_prob": 0.95
+    },
+    {
+      "train_no": "12139",
+      "train_name": "Punjab Mail (Up)",
+      "src_station": "CSMT",
+      "dest_station": "NDLS",
+      "departure_time": "19:35",
+      "arrival_time": "21:10",
+      "day_offset": 1,
+      "classes": [
+        "1A",
+        "2A",
+        "3A",
+        "SL"
+      ],
+      "avg_delay_mins": 40,
+      "availability_status": "AVAILABLE-0010",
+      "confirmation_prob": 0.88
+    }
+  ]
+}

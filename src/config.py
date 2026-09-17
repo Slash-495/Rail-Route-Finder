@@ -37,3 +37,12 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 MIN_LAYOVER_BUFFER_MINS = 30
 MAX_LAYOVER_BUFFER_MINS = 360
 DEFAULT_CLASS_PRIORITY = ["1A", "2A", "3A", "SL", "CC", "2S"]
+
+# Default HTTP headers for web/API queries in case Streamlit Cloud IP is rate-limited
+DEFAULT_HTTP_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+    "Accept": "application/json, text/plain, */*",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Connection": "keep-alive",
+}
+

@@ -21,11 +21,22 @@ def calculate_duration_mins(dep_time: str, arr_time: str) -> int:
 
 @lru_cache(maxsize=None)
 def _load_network_data(dataset_path: Path = TRAIN_NETWORK_JSON) -> Dict[str, Any]:
-    """Internal helper to load train network JSON dataset cached in memory via LRU cache."""
-    if not dataset_path.exists():
-        return {"stations": [], "trains": []}
-    with open(dataset_path, "r", encoding="utf-8") as f:
-        return json.load(f)
+    """Internal helper to load train network JSON dataset cached in memory via LRU cache.
+
+    If dataset file is missing (e.g. fresh clone on Streamlit Cloud), dynamically
+    generates and persists the sample dataset instead of returning empty data.
+    """
+    if dataset_path and Path(dataset_path).exists():
+        with open(dataset_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+
+    # Dynamic fallback: generate dataset on-the-fly if missing on disk
+    try:
+        from src.data.load_sample_data import generate_sample_dataset, save_dataset
+        return save_dataset(Path(dataset_path))
+    except Exception:
+        from src.data.load_sample_data import generate_sample_dataset
+        return generate_sample_dataset()
 
 
 @lru_cache(maxsize=None)
