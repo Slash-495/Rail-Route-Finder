@@ -24,6 +24,10 @@ MAJOR_JUNCTION_BUFFERS: Dict[str, int] = {
     "PRYJ": 45,  # Prayagraj Junction (10 platforms)
     "BSB": 45,   # Varanasi Junction (9 platforms)
     "ADI": 45,   # Ahmedabad Junction (12 platforms)
+    "AGC": 45,   # Agra Cantt (6 platforms)
+    "GWL": 45,   # Gwalior Junction (4 platforms)
+    "VGLJ": 45,  # Virangana Lakshmibai Jhansi (8 platforms)
+    "KOTA": 45,  # Kota Junction (6 platforms)
 }
 
 DEFAULT_JUNCTION_BUFFER_MINS: int = 30
@@ -49,7 +53,7 @@ def get_dynamic_junction_buffer(station_code: str) -> int:
     Returns:
         int: Mandatory minimum transfer buffer in minutes.
     """
-    code_upper = station_code.upper()
+    code_upper = station_code.strip().upper()
     return MAJOR_JUNCTION_BUFFERS.get(code_upper, DEFAULT_JUNCTION_BUFFER_MINS)
 
 

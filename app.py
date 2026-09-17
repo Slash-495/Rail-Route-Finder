@@ -17,7 +17,6 @@ from src.agents import VerifierAgent, RankingAgent
 from src.config import LOGS_DIR, TRAJECTORIES_DIR, BENCHMARK_RESULTS_JSON
 from src.utils.logger import get_logger
 
-st.write(os.listdir("logs/trajectories"))
 st.set_page_config(
     page_title="RailRouteAgent - Split Journey Planner",
     page_icon="🚄",
@@ -43,43 +42,61 @@ else:
 # -----------------------------------------------------------------------------
 with tab1:
     st.sidebar.header("🗺️ Journey Parameters")
-    
+
     with st.sidebar.form("route_form"):
         origin_input = st.text_input("Origin Station Code", value="NDLS", help="e.g. NDLS (New Delhi)")
         dest_input = st.text_input("Destination Station Code", value="MAO", help="e.g. MAO (Madgaon, Goa)")
         date_input = st.date_input("Travel Date", value=datetime.date(2026, 9, 15))
         submitted = st.form_submit_button("Find Verified Routes", type="primary")
 
-    if submitted or st.session_state.get("ran_query"):
-        if submitted:
-            st.session_state["ran_query"] = True
-            st.session_state["origin"] = origin_input
-            st.session_state["dest"] = dest_input
-            st.session_state["date"] = str(date_input)
+    if submitted:
+        orig = origin_input.strip().upper()
+        dest = dest_input.strip().upper()
+        travel_date = str(date_input)
 
-        orig = st.session_state.get("origin", "NDLS").strip().upper()
-        dest = st.session_state.get("dest", "MAO").strip().upper()
-        travel_date = st.session_state.get("date", "2026-09-15")
+        st.session_state["ran_query"] = True
+        st.session_state["origin"] = orig
+        st.session_state["dest"] = dest
+        st.session_state["date"] = travel_date
+
         session_id = f"{orig}_{dest}_{travel_date}".replace("-", "")
+
+        # Clear telemetry buffer so fresh run does not concatenate previous traces
+        get_logger().clear()
 
         with st.spinner("Agents are traversing the graph and auditing risk..."):
             verifier = VerifierAgent()
             ranker = RankingAgent()
             verified_routes = verifier.verify_and_refine(orig, dest, travel_date)
 
+        st.session_state["verified_routes"] = verified_routes
         if not verified_routes:
-            st.error("❌ No operationally feasible split-journey routes found matching the mandatory safety criteria.")
-            get_logger().export_trajectory(session_id)
+            st.session_state["report_markdown"] = None
+            exported_path = get_logger().export_trajectory(session_id)
         else:
             report_markdown = ranker.rank_and_summarize(verified_routes)
-            get_logger().export_trajectory(session_id)
-            st.markdown(report_markdown)
-            
+            st.session_state["report_markdown"] = report_markdown
+            exported_path = get_logger().export_trajectory(session_id)
+
+        st.session_state["latest_trajectory"] = str(exported_path)
+
+    if st.session_state.get("ran_query"):
+        if not st.session_state.get("verified_routes"):
+            st.error("❌ No operationally feasible split-journey routes found matching the mandatory safety criteria.")
+        else:
+            if st.session_state.get("report_markdown"):
+                st.markdown(st.session_state["report_markdown"])
+
             st.divider()
             st.markdown("### 🛡️ IRCTC Booking Safety Gate (Consequential Action Safeguard)")
             if st.button("Simulate Booking (Sandbox)", type="secondary"):
+                orig = st.session_state.get("origin", "NDLS")
+                dest = st.session_state.get("dest", "MAO")
+                travel_date = st.session_state.get("date", "2026-09-15")
+                session_id = f"{orig}_{dest}_{travel_date}".replace("-", "")
                 get_logger().log_event("System", "human_checkpoint", {"action": "SIMULATE_BOOKING", "user_input": "Sandbox UI Button"})
-                get_logger().export_trajectory(session_id)
+                exported_path = get_logger().export_trajectory(session_id)
+                st.session_state["latest_trajectory"] = str(exported_path)
                 st.success("✅ [SANDBOX] Booking simulation successful. No actual transaction occurred.")
     else:
         st.info("👈 Enter origin, destination, and travel date in the sidebar form and click **Find Verified Routes** to run the multi-agent planning & reflection pipeline.")
@@ -101,11 +118,21 @@ with tab2:
         # Sort files by modification time descending (most recently modified first)
         json_files.sort(key=os.path.getmtime, reverse=True)
         file_options = {os.path.basename(f): f for f in json_files}
+        file_names = list(file_options.keys())
+
+        # Default to latest trajectory from Live Demo search if available
+        default_index = 0
+        latest_traj = st.session_state.get("latest_trajectory")
+        if latest_traj:
+            latest_base = os.path.basename(latest_traj)
+            if latest_base in file_names:
+                default_index = file_names.index(latest_base)
 
         selected_file_name = st.selectbox(
             "Select Trajectory Trace File",
-            options=list(file_options.keys()),
-            index=0
+            options=file_names,
+            index=default_index,
+            help="Trajectory traces from logs/trajectories/ (latest modified first)"
         )
         selected_path = file_options[selected_file_name]
 

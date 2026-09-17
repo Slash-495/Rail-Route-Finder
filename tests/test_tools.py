@@ -28,6 +28,27 @@ def test_find_split_junctions():
         assert "train_2" in s
         assert s["scheduled_layover_mins"] > 0
         assert s["scheduled_layover_mins"] <= 360
+    # Confirms intermediate junctions like CSMT and BPL are found
+    assert any(s["junction"] == "BPL" for s in splits)
+
+
+def test_find_split_junctions_ndls_to_bpl():
+    splits = find_split_junctions("NDLS", "BPL", max_layover_hrs=6)
+    assert len(splits) >= 1
+    # Intermediate transfer hubs along Delhi-Bhopal corridor
+    found_junctions = {s["junction"] for s in splits}
+    assert found_junctions.intersection({"AGC", "GWL", "VGLJ", "KOTA"})
+    for s in splits:
+        assert s["train_1"]["src_station"] == "NDLS"
+        assert s["train_2"]["dest_station"] == "BPL"
+        assert s["scheduled_layover_mins"] > 0
+
+
+def test_find_split_junctions_whitespace_and_case():
+    splits = find_split_junctions(" ndls ", " bpl ")
+    assert len(splits) >= 1
+    splits_mao = find_split_junctions("Ndls", "mao ")
+    assert len(splits_mao) >= 1
 
 
 def test_get_dynamic_junction_buffer():
