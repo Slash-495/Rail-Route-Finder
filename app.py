@@ -2,7 +2,7 @@
 RailRouteAgent Streamlit Dashboard & Trajectory Viewer
 Multi-Agent Graph Search & Risk Audit Engine for Indian Railways Split Journeys.
 """
-st.write(os.listdir("logs/trajectories")).
+st.write(os.listdir("logs/trajectories"))
 import os
 os.makedirs("logs/trajectories", exist_ok=True)
 import datetime
