@@ -1,5 +1,5 @@
 """
-RailRouteAgent Streamlit Dashboard
+RailRouteAgent Streamlit Dashboard & Trajectory Viewer
 Multi-Agent Graph Search & Risk Audit Engine for Indian Railways Split Journeys.
 """
 
@@ -11,7 +11,7 @@ import pandas as pd
 import streamlit as st
 
 from src.agents import VerifierAgent, RankingAgent
-from src.config import BENCHMARK_RESULTS_JSON
+from src.config import LOGS_DIR, TRAJECTORIES_DIR, BENCHMARK_RESULTS_JSON
 
 st.set_page_config(
     page_title="RailRouteAgent - Split Journey Planner",
@@ -27,10 +27,14 @@ st.markdown(
     "Uncovers operationally safe, high-probability 2-leg transfer itineraries when direct train tickets are sold out or heavily waitlisted."
 )
 
-tab1, tab2 = st.tabs(["🚆 Route Planner", "📊 Evaluation Metrics"])
+query_tab = st.query_params.get("tab", "demo")
+if query_tab == "viewer":
+    tab2, tab1 = st.tabs(["📜 Trajectory Viewer", "🚆 Live Demo"])
+else:
+    tab1, tab2 = st.tabs(["🚆 Live Demo", "📜 Trajectory Viewer"])
 
 # -----------------------------------------------------------------------------
-# TAB 1: Route Planner
+# TAB 1: Live Demo
 # -----------------------------------------------------------------------------
 with tab1:
     st.sidebar.header("🗺️ Journey Parameters")
@@ -71,62 +75,92 @@ with tab1:
         st.info("👈 Enter origin, destination, and travel date in the sidebar form and click **Find Verified Routes** to run the multi-agent planning & reflection pipeline.")
 
 # -----------------------------------------------------------------------------
-# TAB 2: Evaluation Metrics (The Hackathon Flex)
+# TAB 2: Trajectory Viewer
 # -----------------------------------------------------------------------------
 with tab2:
-    st.markdown("## 📊 Iteration Benchmark Performance")
-    st.markdown("Comparing **Zero-Shot LLM (Iteration 0)** against **RailRouteAgent (Iteration 3)** across 12 structured benchmark scenarios.")
+    st.markdown("## 📜 Execution Trajectory Viewer")
+    st.markdown("Inspect multi-agent internal reasoning, tool calls, verifier reflection critiques, and telemetry event logs step-by-step.")
 
-    benchmark_path = BENCHMARK_RESULTS_JSON
-
-    try:
-        if not benchmark_path.exists():
-            st.warning("⚠️ Benchmark results file not found at `logs/benchmark_results.json`. Please run `python -m benchmarks.evaluator --mode compare` first to generate evaluation metrics.")
+    trajectories_dir = TRAJECTORIES_DIR
+    if not trajectories_dir.exists():
+        st.warning(f"⚠️ Trajectories directory not found at `{trajectories_dir}`.")
+    else:
+        json_files = sorted(list(trajectories_dir.glob("*.json")), key=lambda p: p.stat().st_mtime, reverse=True)
+        if not json_files:
+            st.warning("⚠️ No trajectory JSON files found in `logs/trajectories/`.")
         else:
-            with open(benchmark_path, "r", encoding="utf-8") as f:
-                benchmark_data = json.load(f)
+            file_options = {f.name: f for f in json_files}
+            default_file = "run_NDLS_MAO_20260915.json" if "run_NDLS_MAO_20260915.json" in file_options else list(file_options.keys())[0]
+            default_idx = list(file_options.keys()).index(default_file)
+            
+            selected_file_name = st.selectbox("Select Trajectory Trace File", options=list(file_options.keys()), index=default_idx)
+            selected_path = file_options[selected_file_name]
 
-            summary = benchmark_data.get("summary_metrics", {})
-            baseline = summary.get("zero_shot_llm_baseline", {})
-            agent = summary.get("agent", {})
+            try:
+                with open(selected_path, "r", encoding="utf-8") as f:
+                    events = json.load(f)
 
-            metrics_data = pd.DataFrame([
-                {"Metric": "Viable Route Found (%)", "Approach": "Baseline (Zero-Shot LLM)", "Value": float(baseline.get("viable_route_found_rate", 100.0))},
-                {"Metric": "Viable Route Found (%)", "Approach": "Agent Solution (Iter 3)", "Value": float(agent.get("viable_route_found_rate", 100.0))},
-                {"Metric": "Feasibility Pass Rate (%)", "Approach": "Baseline (Zero-Shot LLM)", "Value": float(baseline.get("operational_feasibility_pass_rate", 0.0))},
-                {"Metric": "Feasibility Pass Rate (%)", "Approach": "Agent Solution (Iter 3)", "Value": float(agent.get("operational_feasibility_pass_rate", 100.0))},
-                {"Metric": "Hallucination Rate (%)", "Approach": "Baseline (Zero-Shot LLM)", "Value": float(baseline.get("hallucination_rate", 0.0))},
-                {"Metric": "Hallucination Rate (%)", "Approach": "Agent Solution (Iter 3)", "Value": float(agent.get("hallucination_rate", 0.0))},
-                {"Metric": "Avg Confirmation Prob (%)", "Approach": "Baseline (Zero-Shot LLM)", "Value": round(float(baseline.get("avg_confirmation_prob", 0.6817)) * 100, 1)},
-                {"Metric": "Avg Confirmation Prob (%)", "Approach": "Agent Solution (Iter 3)", "Value": round(float(agent.get("avg_confirmation_prob", 0.6483)) * 100, 1)},
-            ])
+                if not isinstance(events, list):
+                    st.error("Invalid trajectory JSON format. Expected an array of event objects.")
+                else:
+                    col1, col2, col3, col4 = st.columns(4)
+                    col1.metric("Total Steps", len(events))
+                    col2.metric("Planner Events", sum(1 for e in events if e.get("agent") == "Planner"))
+                    col3.metric("Verifier Audits", sum(1 for e in events if e.get("agent") == "Verifier"))
+                    col4.metric("Tool Calls", sum(1 for e in events if e.get("event_type") == "tool_call"))
 
-            # Altair Grouped Bar Chart
-            chart = (
-                alt.Chart(metrics_data)
-                .mark_bar()
-                .encode(
-                    x=alt.X("Approach:N", title=None, axis=alt.Axis(labels=True)),
-                    y=alt.Y("Value:Q", title="Percentage (%)", scale=alt.Scale(domain=[0, 110])),
-                    color=alt.Color("Approach:N", scale=alt.Scale(range=["#ef5350", "#66bb6a"])),
-                    column=alt.Column("Metric:N", title=None),
-                    tooltip=["Metric", "Approach", "Value"]
-                )
-                .properties(width=160, height=320)
-                .configure_view(stroke=None)
-            )
+                    st.divider()
+                    st.markdown("### Step-by-Step Event Trajectory")
 
-            st.altair_chart(chart, use_container_width=True)
-    except FileNotFoundError:
-        st.warning("⚠️ Benchmark results file not found at `logs/benchmark_results.json`. Please run `python -m benchmarks.evaluator --mode compare` first to generate evaluation metrics.")
-    except Exception as e:
-        st.warning(f"⚠️ Could not read benchmark results from `logs/benchmark_results.json`: {e}")
+                    for idx, event in enumerate(events):
+                        agent = event.get("agent", "System")
+                        event_type = event.get("event_type", "unknown")
+                        timestamp = event.get("timestamp", "")
+                        payload = event.get("payload", {})
 
-    st.info(
-        "🔥 **System Design Insight (The Hot Take)**:\n\n"
-        "Agents confidently fail when they trust pure graph connectivity over operational reality. "
-        "The Agent's average confirmation probability (**64.8%**) is intentionally slightly lower than the "
-        "zero-shot baseline (**68.2%**) because the baseline falsely maximized probability by accepting "
-        "physically impossible 5-minute cross-platform layovers. The Agent filtered out these physical "
-        "impossibilities, sacrificing theoretical probability for operational reality."
-    )
+                        badge_color = {
+                            "Planner": "🟦",
+                            "Verifier": "🟥",
+                            "Ranking": "🟩",
+                            "System": "🟧"
+                        }.get(agent, "⚪")
+
+                        expander_title = f"{badge_color} Step {idx + 1}: [{agent}] — {event_type.upper().replace('_', ' ')} ({timestamp[:19]})"
+
+                        with st.expander(expander_title, expanded=(idx in [0, 1, 2, 3] or event_type in ["reflection_feedback", "human_checkpoint"])):
+                            if event_type == "prompt":
+                                st.markdown(f"**Agent**: `{agent}`")
+                                if isinstance(payload, dict):
+                                    if "prompt" in payload:
+                                        st.markdown(f"**User/Input Prompt**:\n```text\n{payload['prompt']}\n```")
+                                    if "system_prompt" in payload:
+                                        st.markdown(f"**System Instruction**:\n> {payload['system_prompt']}")
+                                    if "origin" in payload:
+                                        st.json(payload)
+                                else:
+                                    st.write(payload)
+
+                            elif event_type == "tool_call":
+                                st.markdown(f"**Tool Invoked**: `{payload.get('tool')}`")
+                                if "args" in payload:
+                                    st.markdown("**Arguments**:")
+                                    st.json(payload["args"])
+
+                            elif event_type == "tool_response":
+                                st.markdown(f"**Tool Response Source**: `{payload.get('tool', agent)}`")
+                                st.json(payload)
+
+                            elif event_type == "reflection_feedback":
+                                st.warning(f"⚠️ **Verifier Critique Feedback**:\n\n{payload.get('critique', payload)}")
+                                if "iteration" in payload:
+                                    st.caption(f"Reflection Loop Iteration {payload['iteration']}")
+
+                            elif event_type == "human_checkpoint":
+                                st.info(f"🛡️ **Human-in-the-Loop Safeguard Action**:\n\nAction: `{payload.get('action')}` | User Input: `{payload.get('user_input')}`")
+                                st.json(payload)
+
+                            else:
+                                st.json(payload)
+
+            except Exception as e:
+                st.error(f"Error reading trajectory file `{selected_file_name}`: {e}")
